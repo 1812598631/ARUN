@@ -16,9 +16,9 @@
 //º¯ÊýÉùÃ÷
 
 void set_point(u16 x,u16 y,u16 p);
-float GetPosX(void);
-float GetPosY(void);
-float GetAngle(void);
+//u16 GetPosX(void);
+//u16 GetPosY(void);
+//u16 GetAngle(void);
 
 void ps2_move(void);
 void walk_point(void);

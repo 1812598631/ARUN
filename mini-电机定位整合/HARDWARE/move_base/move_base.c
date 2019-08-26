@@ -32,12 +32,16 @@ void ps2_move()
 u8 key=0;
 	s16 speed;
 	s16 swerve;
+	delay_ms(100);
 	key=PS2_DataKey();
 	if(key!=0)                   //有按键按下
 	{
 //				printf(" %5d %5d %5d %5d\r\n",PS2_AnologData(PSS_LX),PS2_AnologData(PSS_LY),
 //		                              PS2_AnologData(PSS_RX),PS2_AnologData(PSS_RY) );
 //				printf(" %5d %5d\r\n",PS2_AnologData(PSS_LY),PS2_AnologData(PSS_RX));
+		
+		if(key == 11)
+			{
 				speed = PS2_AnologData(PSS_LY)-127;
 				swerve = (PS2_AnologData(PSS_RX)-128)*12*((float)abs(speed)/128); //	speed取绝对值，	算数运算，得到转弯量。
 				speed = -(PS2_AnologData(PSS_LY)-127)*20;	   //正：前进；  负：后退
@@ -109,6 +113,13 @@ u8 key=0;
 				 PS2_Vibration(0x00,0x00); 
     	}
 		}
+	else
+		{
+			give_motor1(0);
+				give_motor2(0);
+			PID_Move_Clear(&chassis_move);
+		}
+	}
 void walk_point(void)
 {
 			presentline.point.x=GetPosX();
@@ -210,6 +221,8 @@ float AnglePid(float valueSet,float valueNow)
   * @param  angle目标角度
   * @retval None
   */
+
+//小动作
 void move_to_pos(float x,float y,float angle)
 {
 	float x_Now=GetPosX();
@@ -233,6 +246,7 @@ motorCMD(forwardspeed-turnspeed,forwardspeed+turnspeed);
   * @param  gospeed：基础速度
   * @retval None
   */
+//小动作 原地旋转
 void minimum_Turn(float angle)
 {
 	float getAngle=0.0f;
@@ -254,6 +268,7 @@ void minimum_Turn(float angle)
   * @param  gospeed：基础速度
   * @retval None
   */
+//小动作 向前旋转
 void forward_Turn(float angle,float gospeed)
 {
 		float getAngle=0.0f;
@@ -277,6 +292,7 @@ void forward_Turn(float angle,float gospeed)
   * @param  gospeed：基础速度
   * @retval None
   */
+//小动作 倒行转弯
 void back_Turn(float angle,float gospeed)
 {
 	float getAngle=0.0f;
@@ -299,13 +315,22 @@ void back_Turn(float angle,float gospeed)
   * @note	可由A1，B1，C1设置直线方程后，沿目标直线方向行走
   * @note	前进速度可由距离PID调整  问题是两个PID不太好调  待调试后解决
   * @note 直线斜率为负值，存疑
+
   * @param A1  
   * @param B1
   * @param C1
   * @param dir:为0 往上或右走，为1 往下或往左走
   * @param setSpeed：速度
   * @retval return_value 0为 未到达目标直线  1为 已到达目标直线距离范围内
+
+
+
+  * @note 大动作 在目标直线轨道上行驶 可通过坐标判断在直线的哪个位置
+	* @note 用到了距离-角度PID 来接近目标轨道 角度PID来保证沿着直线轨道行驶
+  * @note 用到了两种小动作 离目标直线距离远时 用前进转弯来接近
+  * @note 接近到达目标直线时原地旋转调整到目标方向 在用前进转弯来保持行驶直线
   */
+
 uint8_t straightLine(float A1,float B1,float C1,uint8_t dir,float setSpeed)
 {
 	
@@ -427,6 +452,14 @@ uint8_t straightLine(float A1,float B1,float C1,uint8_t dir,float setSpeed)
   * @param clock:为0 顺时针，为1 逆时针
   * @param v：速度
   * @retval None
+		
+		
+	* @note 大动作 输入目标圆环圆心的 x,y,以及圆环半径R。在目标圆环轨道上行驶 可通过坐标判断在直线的哪个位置
+	* @note 用到了距离-角度PID 来接近目标轨道 角度PID来保证沿着圆环轨道行驶 
+  * @note 用到了两种小动作 离目标直线距离远时 用前进转弯来接近
+  * @note 接近到达目标直线时原地旋转调整到目标方向 在用前进转弯来保持行驶直线
+		
+		
   */
 void closeRound(float x,float y,float R,float clock,float backspeed)
 {

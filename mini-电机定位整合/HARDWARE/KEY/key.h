@@ -3,6 +3,7 @@
 #include "sys.h"
 #include "delay.h"
 #include "LCD.h"
+#include "stdio.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK miniSTM32开发板
@@ -19,7 +20,6 @@
 #define USART_REC_LEN_2  			200  	//定义最大接收字节数 200
 #define USART_REC_LEN_3  			200  	//定义最大接收字节数 200
 
-	  	extern int r;
 extern u8  USART_RX_BUF2[USART_REC_LEN_2]; //接收缓冲,最大USART_REC_LEN个字节.末字节为换行符 
 extern u16 USART_RX_STA2;         		//接收状态标记	
 
@@ -27,11 +27,14 @@ extern u8  USART_RX_BUF3[USART_REC_LEN_3]; //接收缓冲,最大USART_REC_LEN个字节.末
 extern u16 USART_RX_STA3;         		//接收状态标记	
 
 u16 Laser(u16 date);
+void getXYP(void);
 float GetPosX(void);
 float GetPosY(void);
-float GetPosAngle(void);
+int GetAngle(void);
 void MyusartInit2(u16);
-void MyusartInit3(u16);
+void MyusartInit5(u32);
 //void DMA_Configuration(void);
+unsigned long strtou32(char *str);
 u16 Laser_Distance(void);
+float ConvertTo32(int la, int lb, int lc, int ld);
 #endif

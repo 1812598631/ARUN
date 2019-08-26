@@ -56,10 +56,10 @@ void PID_para_init(PidTypeDef *pid,const fp32 PID[3])
 }
 fp32 PID_Calc(PidTypeDef *pid, fp32 ref, fp32 set)
 {
-//    if (pid == NULL)
-//    {
-//        return 0.0f;
-//    }
+    if (pid == NULL)
+    {
+        return 0.0f;
+    }
 
     pid->error[2] = pid->error[1];
     pid->error[1] = pid->error[0];
@@ -151,77 +151,6 @@ void PID_clear(PidTypeDef *pid)
 }
 
 
-//float pid_control_gyro_left(PidTypeDef *pid,float ref,float set)
-//{
-//    pid->set = set;
-//    pid->fdb = ref;
-//    pid->error[0] = set - ref;  
-//	  if(pid->error[0]<95&&pid->error[0]>45)  pid->out=-4;
-//	  if(pid->error[0]<45&&pid->error[0]>20)  pid->out=-3.5;
-//	  if(pid->error[0]<20&&pid->error[0]>10)  pid->out=-2.5;
-//	  if(pid->error[0]>-95&&pid->error[0]<-45)  pid->out=4;
-//	  if(pid->error[0]>-45&&pid->error[0]<-20)  pid->out=3.5;
-//	  if(pid->error[0]>-20&&pid->error[0]<-10)  pid->out=2.5;
-//	  if(pid->error[0]<5&&pid->error[0]>-5)  pid->out=0;
-//	  return pid->out;
-//}
-//float pid_control_gyro_right(PidTypeDef *pid,float ref,float set)
-//{
-//	  pid->set = set;
-//    pid->fdb = ref;
-//    pid->error[0] = set - ref;  
-//	  if(pid->error[0]<95&&pid->error[0]>45)  pid->out=4;
-//	  if(pid->error[0]<45&&pid->error[0]>20)  pid->out=3.5;
-//	  if(pid->error[0]<20&&pid->error[0]>10)  pid->out=2.5;
-//	  if(pid->error[0]>-95&&pid->error[0]<-45)  pid->out=-4;
-//	  if(pid->error[0]>-45&&pid->error[0]<-20)  pid->out=-3.5;
-//	  if(pid->error[0]>-20&&pid->error[0]<-10)  pid->out=-2.5;
-//	  if(pid->error[0]<5&&pid->error[0]>-5)  pid->out=0;
-//	  return pid->out;
-//}
-
-
-//float pid_control_distance_left(PidTypeDef *pid,float ref,float set)
-//{
-//    pid->error[1] = pid->error[0];
-//    pid->set = set;
-//    pid->fdb = ref;
-//    pid->error[0] = set - ref;  
-//		if(pid->error[0]<500&&pid->error[0]>30)  pid->out=1;
-//	  if(pid->error[0]>-500&&pid->error[0]<-30)  pid->out=2;
-//		if(pid->error[0]<30&&pid->error[0]>-30)  pid->out=0;
-//	  return pid->out;
-//}
-//float pid_control_distance_right(PidTypeDef *pid,float ref,float set)
-//{
-//	  pid->error[1] = pid->error[0];
-//    pid->set = set;
-//    pid->fdb = ref;
-//    pid->error[0] = set - ref;  
-//		if(pid->error[0]<500&&pid->error[0]>30)  pid->out=2;
-//	  if(pid->error[0]>-500&&pid->error[0]<-30)  pid->out=1;
-//		if(pid->error[0]<30&&pid->error[0]>-30)  pid->out=0;
-//	  return pid->out;
-//}
-//float pid_control_distance_all(PidTypeDef *pid,float ref,float set)
-//{
-//	  pid->error[1] = pid->error[0];
-//    pid->set = set;
-//    pid->fdb = ref;
-//    pid->error[0] = set - ref;  
-//	  if(pid->error[0]<1000&&pid->error[0]>500)  pid->out=0.6;
-//		if(pid->error[0]<500&&pid->error[0]>100)  pid->out=0.2;
-//	  if(pid->error[0]>-1000&&pid->error[0]<500)  pid->out=-0.6;
-//	  if(pid->error[0]>-500&& pid->error[0]<-100)pid->out=-0.2;
-//	  if(pid->error[0]>-50&&pid->error[0]<50)pid->out=0;
-//	  return pid->out;
-//}
-
-//void PID_Init_distance(void)           //初始化变量
-//{
-//	distance_left.Kd=5;
-//	distance_left.out=0;
-//}
 	
 
 

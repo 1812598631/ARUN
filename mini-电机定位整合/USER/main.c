@@ -16,7 +16,8 @@
 
 #define PI (3.141593f)
 static float laser_distance;
-float Px,Py,Pp;
+fp32 Px,Py;
+int Pp;
 fp32 v;
 /************************************************
 所有变量P均为角度
@@ -89,6 +90,87 @@ PID参数繁多 难调
 定时器中断影响主函数运行
 ************************************************/
 
+
+/************************************************
+8-24凌晨更新：
+目前待解决问题：
+定位底盘整合
+激光接受数据已成功
+失败原因：未将激光与单片机共地，导致相对低电平并不相同
+串口通讯未
+LCD显示屏不能显示负值
+电机赋值时两种方式  数值取反+1	/   直接添-号   
+未明确区别，暂时无影响
+串口发送float为32位数据 分四个字节 前两个字节为整数部分  后两个字节为小数部分
+
+motorCMD函数重写  整个底盘动作逻辑需要重新写
+定时器PID取样未解决
+PS2初步加入，通讯不成功，自动挡/手动挡未解决
+
+分球：OPENMV寻找矩形中心调整步进电机旋转  从而使分球结构回原点  未调试
+颜色变化已解决，原因为初始上电时白平衡未关闭  对后面关闭时起对比作用
+PID取值未解决 
+撞边程序：   直线撞中间储藏室后倒退至限位开关触发 射光弹仓后再次出发
+
+分球可改为 循迹模块 循白线使得步进电机归原点
+
+可能遇到的问题：
+PID参数繁多 难调 
+定位不精准 路径无法用坐标规划
+上位机通讯无法传输数据
+定时器中断影响主函数运行
+************************************************/
+
+
+/************************************************
+8-24
+目前待解决问题：
+串口接收到的字符数组无法转化为字符串
+则无法使用字符串函数对float xyp进行处理
+
+串口中断部分已经写完，待理清逻辑
+未调分球转盘
+
+
+可能遇到的问题：
+PID参数繁多 难调 
+定位不精准 路径无法用坐标规划
+上位机通讯无法传输数据
+定时器中断影响主函数运行
+************************************************/
+
+/************************************************
+8-26
+目前待解决问题：
+
+
+串口3引脚与LCD冲突
+
+改为串口5
+
+未调分球转盘
+串口接受已完成
+
+减少了串口中断中的程序，使得串口得以正确接收
+
+总体逻辑未写
+
+各部分模块程序基本完成
+射球模块每次射球后需要5秒将射球电机恢复
+
+各部分程序未对复数 角度转换进行处理
+PID定时器计算
+各部分PID的使用种类 增量式1/位置式0
+
+可能遇到的问题：
+PID参数繁多 难调 
+定位不精准 路径无法用坐标规划
+
+************************************************/
+
+
+
+
 /************************************************
 作者：阿RUN @SAU——科协
 ************************************************/
@@ -98,13 +180,15 @@ PID参数繁多 难调
  {
 //	 int32_t motor_v1=3000;
 //int32_t motor_v2=3000;
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置中断优先级分组为组2：2位抢占优先级，2位响应优先级
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);//设置中断优先级分组为组2：2位抢占优先级，2位响应优先级
 	uart_init(115200);//串口初始化为115200	 
+	 
+	 
 	delay_init();//延时函数初始化	  
 	MyusartInit2(19200);//串口2
-//	MyusartInit3(9600);
-	 LCD_Init();
-	 LED_Init();
+	MyusartInit5(115200);
+	 	 LCD_Init();
+
 	CAN1_Mode_Init(CAN_SJW_1tq, CAN_BS2_3tq, CAN_BS1_8tq, 3, CAN_Mode_Normal);  //CAN初始化模式,波特率1Mbps  
 	chassis_init(&chassis_move);//底盘初始化
 	 PS2_Init();					//PS2管脚初始化
@@ -121,37 +205,30 @@ PID参数繁多 难调
 //give_motor2(motor_v2);
 		while(1)
 	{
-//		
-//		Px=GetPosX();
-//		Py=GetPosY();
-//		Pp=GetAngle();
-//LCD_ShowString(60,50,200,16,16,"x=");	
-//LCD_ShowxNum(60,70,Px,3,16,0X80);
-//LCD_ShowString(60,90,200,16,16,"y=");	
-//LCD_ShowxNum(60,110,Py,3,16,0X80);
-//LCD_ShowString(60,130,200,16,16,"Angle=");	
-//LCD_ShowxNum(60,150,Pp,3,16,0X80);
-		
-	
+		Px=GetPosX();
+		Py=GetPosY();
+		Pp=GetAngle();
+LCD_ShowString(60,50,200,16,16,"x=");	
+LCD_ShowxNum(60,70,Px,6,16,0X80);
+LCD_ShowString(60,90,200,16,16,"y=");	
+LCD_ShowxNum(60,110,Py,6,16,0X80);
+LCD_ShowString(60,130,200,16,16,"Angle=");	
+LCD_ShowxNum(60,150,Pp,6,16,0X80);
 //		walk_point();		//点到点测试
-		laser_distance=Laser(0x44);
-			 delay_ms(500);
-		LCD_ShowString(60,50,200,16,16,"distance=");	
-		LCD_ShowxNum(60,70,laser_distance,3,16,0X80);
+		
+		
+//		laser_distance=Laser(0x44);
+//		LCD_ShowString(60,50,200,16,16,"distance=");	
+//		LCD_ShowxNum(60,70,laser_distance,3,16,0X80);
 
 
 		//delay_ms(20);
-		ps2_move();
-		
-		v=DistancePid(laser_distance);
-		LCD_ShowString(60,90,200,16,16,"v=");	
-		LCD_ShowxNum(60,110,v,5,16,0X80);
-	 		motorCMD(v,v);
-//		POINT_COLOR=RED;//设置字体为红色 
-//		LCD_ShowString(60,50,200,16,16,"data=");	
-//		LCD_ShowxNum(60,70,res,3,16,0X80);
-//		LCD_ShowString(60,90,200,16,16,"CAN=");	
-//		LCD_ShowxNum(60,110,canbuf[0],3,16,0X80);
-//		POINT_COLOR=BLUE;//设置字体为蓝色	  
+//		ps2_move();
+		delay_ms(50);
+//		v=DistancePid(laser_distance);
+//		LCD_ShowString(60,90,200,16,16,"v=");	
+//		LCD_ShowxNum(60,110,v,5,16,0X80);
+//	 		motorCMD(v,v);
+
 	}
 		}
