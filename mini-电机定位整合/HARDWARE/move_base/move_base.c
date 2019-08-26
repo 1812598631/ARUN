@@ -1,7 +1,7 @@
 #include "move_base.h"
 
 ActPoint initpoint;     //点到点算法 初始点结构体初始化
-float initangle = 0;		
+float initangle = 0;
 ActPoint targetpoint;		//目标点结构体初始化
 float targetangle = 0;
 ActLine2 presentline;		//初始直线结构体初始化
@@ -24,163 +24,163 @@ int32_t motor_v2=0;
 //speedBase为基础前进速度
 void motorCMD(int32_t motor1,int32_t motor2)//电机控制 非点到点电机控制函数
 {
-give_motor1(motor1);
-give_motor2(-motor2);
+    give_motor1(motor1);
+    give_motor2(-motor2);
 }
 void ps2_move()
 {
-u8 key=0;
-	s16 speed;
-	s16 swerve;
-	delay_ms(100);
-	key=PS2_DataKey();
-	if(key!=0)                   //有按键按下
-	{
+    u8 key=0;
+    s16 speed;
+    s16 swerve;
+    delay_ms(100);
+    key=PS2_DataKey();
+    if(key!=0)                   //有按键按下
+    {
 //				printf(" %5d %5d %5d %5d\r\n",PS2_AnologData(PSS_LX),PS2_AnologData(PSS_LY),
 //		                              PS2_AnologData(PSS_RX),PS2_AnologData(PSS_RY) );
 //				printf(" %5d %5d\r\n",PS2_AnologData(PSS_LY),PS2_AnologData(PSS_RX));
-		
-		if(key == 11)
-			{
-				speed = PS2_AnologData(PSS_LY)-127;
-				swerve = (PS2_AnologData(PSS_RX)-128)*12*((float)abs(speed)/128); //	speed取绝对值，	算数运算，得到转弯量。
-				speed = -(PS2_AnologData(PSS_LY)-127)*20;	   //正：前进；  负：后退
+
+        if(key == 11)
+        {
+            speed = PS2_AnologData(PSS_LY)-127;
+            swerve = (PS2_AnologData(PSS_RX)-128)*12*((float)abs(speed)/128); //	speed取绝对值，	算数运算，得到转弯量。
+            speed = -(PS2_AnologData(PSS_LY)-127)*20;	   //正：前进；  负：后退
 //				delay_ms(10);
 //				printf(" %5d \r\n",speed);
 //				printf(" %5d \r\n",swerve);
-				if(speed==0&&swerve==0)
-				{
-					give_motor1(0);
-					give_motor2(0);
-					PID_Move_Clear(&chassis_move);
-				}
-				else
-				{
-					if(speed > 0) //向前
-					{
-						if(swerve < 0)//左转弯
-						{
-	//						speed1 = speed + swerve;
-	//						speed2 = speed;		
-							give_motor1(speed + swerve);
-							give_motor2(~speed+1);
-	//						printf(" %5d %5d\r\n",wheel_speed[0],wheel_speed[1]);
-						}
-						else          //右转弯
-						{
-	//						speed1 = speed; 
-	//						speed2 = speed - swerve;		
-							give_motor1(speed);
-							give_motor2(~(speed - swerve)+1);
-	//						printf(" %5d %5d\r\n",wheel_speed[0],wheel_speed[1]);
-						}
-					}
-					else if(speed < 0)//向后
-					{
-						if(swerve < 0)//左转弯
-						{
-	//						speed1 = speed - swerve;
-	//						speed2 = speed;	
-							give_motor1(speed - swerve);
-							give_motor2(~(speed - swerve)+1);
-						}
-						
-						else//右转弯
-						{
-	//						speed1 = speed; 
-	//						speed2 = speed + swerve;
-							give_motor1(speed);
-							give_motor2(~(speed + swerve)+1);
-						}
-					}
-				}
-			}
-			else 
-			{
+            if(speed==0&&swerve==0)
+            {
+                give_motor1(0);
+                give_motor2(0);
+                PID_Move_Clear(&chassis_move);
+            }
+            else
+            {
+                if(speed > 0) //向前
+                {
+                    if(swerve < 0)//左转弯
+                    {
+                        //						speed1 = speed + swerve;
+                        //						speed2 = speed;
+                        give_motor1(speed + swerve);
+                        give_motor2(~speed+1);
+                        //						printf(" %5d %5d\r\n",wheel_speed[0],wheel_speed[1]);
+                    }
+                    else          //右转弯
+                    {
+                        //						speed1 = speed;
+                        //						speed2 = speed - swerve;
+                        give_motor1(speed);
+                        give_motor2(~(speed - swerve)+1);
+                        //						printf(" %5d %5d\r\n",wheel_speed[0],wheel_speed[1]);
+                    }
+                }
+                else if(speed < 0)//向后
+                {
+                    if(swerve < 0)//左转弯
+                    {
+                        //						speed1 = speed - swerve;
+                        //						speed2 = speed;
+                        give_motor1(speed - swerve);
+                        give_motor2(~(speed - swerve)+1);
+                    }
+
+                    else//右转弯
+                    {
+                        //						speed1 = speed;
+                        //						speed2 = speed + swerve;
+                        give_motor1(speed);
+                        give_motor2(~(speed + swerve)+1);
+                    }
+                }
+            }
+        }
+        else
+        {
 //				delay_ms(10);
-				give_motor1(0);
-				give_motor2(0);
-				PID_Move_Clear(&chassis_move);
+            give_motor1(0);
+            give_motor2(0);
+            PID_Move_Clear(&chassis_move);
 //				printf("  \r\n   %d  is  light  \r\n",Data[1]);//ID
 //				printf("  \r\n   %d  is  pressed  \r\n",key);
 //				printf("  \r\n   %d  is  pressed  \r\n",MASK[key]);
-				if(key == 12)
-				{
-					PS2_Vibration(0x00,0xFF);  //发出震动后必须有延时  delay_ms(1000);
-					delay_ms(500);
-				}
-				else
-				 PS2_Vibration(0x00,0x00); 
-    	}
-		}
-	else
-		{
-			give_motor1(0);
-				give_motor2(0);
-			PID_Move_Clear(&chassis_move);
-		}
-	}
+            if(key == 12)
+            {
+                PS2_Vibration(0x00,0xFF);  //发出震动后必须有延时  delay_ms(1000);
+                delay_ms(500);
+            }
+            else
+                PS2_Vibration(0x00,0x00);
+        }
+    }
+    else
+    {
+        give_motor1(0);
+        give_motor2(0);
+        PID_Move_Clear(&chassis_move);
+    }
+}
 void walk_point(void)
 {
-			presentline.point.x=GetPosX();
-			presentline.point.x=GetPosY();
-			presentline.point.x=GetAngle();
-			set_point(0,1000,0);//设置目标点	x,y,p 
-			MvByLine(presentline,  targetline, 10000);
+    presentline.point.x=GetPosX();
+    presentline.point.x=GetPosY();
+    presentline.point.x=GetAngle();
+    set_point(0,1000,0);//设置目标点	x,y,p
+    MvByLine(presentline,  targetline, 10000);
 }
 
 
 void set_point(u16 x,u16 y,u16 p)
- {
-	targetline.point.x=x;
-	targetline.point.y=y;
-	targetangle=p;
- }
+{
+    targetline.point.x=x;
+    targetline.point.y=y;
+    targetangle=p;
+}
 
 
- /**
+/**
 * @brief 距离PID
 * @note	PID类型：位置型PID
 * @param valueSet：距离设定值
 * @param valueNow：当前距离值
 * @retval 电机前进基础速度
-* @attention 
+* @attention
 */
 
 float DistancePid(float distance)
 {
-	fp32 valueOut;
-	PID_param_dis[0]=55;
-	PID_param_dis[1]=0;
-	PID_param_dis[2]=0;
+    fp32 valueOut;
+    PID_param_dis[0]=55;
+    PID_param_dis[1]=0;
+    PID_param_dis[2]=0;
 
-	PID_Init(&PID_distance,PID_POSITION,PID_param_dis,9000.0f,1000.0f);//PID初始化
-	valueOut=PID_Calc(&PID_distance,distance,0);
-//		LCD_ShowString(150,190,200,16,16,"error=");	
+    PID_Init(&PID_distance,PID_POSITION,PID_param_dis,9000.0f,1000.0f);//PID初始化
+    valueOut=PID_Calc(&PID_distance,distance,0);
+//		LCD_ShowString(150,190,200,16,16,"error=");
 //		LCD_ShowxNum(150,210,distance,3,16,0X80);
-		LCD_ShowString(150,150,200,16,16,"distance=");	
-		LCD_ShowxNum(150,170,valueOut,5,16,0X80);
-	
-	
-	return valueOut;
+    LCD_ShowString(150,150,200,16,16,"distance=");
+    LCD_ShowxNum(150,170,valueOut,5,16,0X80);
+
+
+    return valueOut;
 }
 
 
 
- /**
+/**
 * @brief 距离对角度的增量PID
 * @note	PID类型：位置型PID
 * @param valueSet：距离设定值
 * @param valueNow：当前距离值
 * @retval 电机前进基础速度
-* @attention 
+* @attention
 */
 float Distance_Arc_Pid(float distance)
 {
-	float valueOut;
-	PID_Init(&PID_DisArc,PID_POSITION,PID_param_DisArc,90.0f,10.0f);//位置型PID初始化
-	valueOut=PID_Calc(&PID_DisArc,distance,0);
-	return valueOut;
+    float valueOut;
+    PID_Init(&PID_DisArc,PID_POSITION,PID_param_DisArc,90.0f,10.0f);//位置型PID初始化
+    valueOut=PID_Calc(&PID_DisArc,distance,0);
+    return valueOut;
 }
 
 
@@ -191,119 +191,119 @@ float Distance_Arc_Pid(float distance)
 * @param valueSet：角度设定值
 * @param valueNow：当前角度值
 * @retval 电机速度差值
-* @attention 
+* @attention
 */
 float AnglePid(float valueSet,float valueNow)
 {
-	float err=0;
-	float valueOut=0;
-	err=valueSet-valueNow;
-	//角度突变处理
-	if(err > 180)
-	{
-		err=err-360;
-	}
-	else if(err < -180)
-	{
-		err=360+err;
-	}
-	PID_Init(&PID_angle,PID_POSITION,PID_param_angle,10000.0f,180.0f);//PID初始化
-	valueOut=PID_Calc(&PID_angle,err,0);	//PID计算转弯差值
-	return valueOut;
+    float err=0;
+    float valueOut=0;
+    err=valueSet-valueNow;
+    //角度突变处理
+    if(err > 180)
+    {
+        err=err-360;
+    }
+    else if(err < -180)
+    {
+        err=360+err;
+    }
+    PID_Init(&PID_angle,PID_POSITION,PID_param_angle,10000.0f,180.0f);//PID初始化
+    valueOut=PID_Calc(&PID_angle,err,0);	//PID计算转弯差值
+    return valueOut;
 }
 
 
- /**
-  * @brief  两个PID移动到目标位置
-  * @note	代替point2point算法
-  * @param  x		目标位置X坐标
-  * @param  y		目标位置Y坐标
-  * @param  angle目标角度
-  * @retval None
-  */
+/**
+ * @brief  两个PID移动到目标位置
+ * @note	代替point2point算法
+ * @param  x		目标位置X坐标
+ * @param  y		目标位置Y坐标
+ * @param  angle目标角度
+ * @retval None
+ */
 
 //小动作
 void move_to_pos(float x,float y,float angle)
 {
-	float x_Now=GetPosX();
-	float y_Now=GetPosX();
-	float angle_Now=GetAngle();
-	float forwardspeed,turnspeed;
+    float x_Now=GetPosX();
+    float y_Now=GetPosX();
+    float angle_Now=GetAngle();
+    float forwardspeed,turnspeed;
 
-	float aim_distance=sqrt(pow(x_Now-x,2)+pow(y_Now-y,2));  //当前点到目标点的直线距离
+    float aim_distance=sqrt(pow(x_Now-x,2)+pow(y_Now-y,2));  //当前点到目标点的直线距离
 
-	forwardspeed = DistancePid(aim_distance);		//距离PID调整前进速度到达目标点			应调整为距离——角度PID
-	turnspeed = AnglePid(angle,angle_Now);			//角度PID调整两轮差速到达目标方向
+    forwardspeed = DistancePid(aim_distance);		//距离PID调整前进速度到达目标点			应调整为距离——角度PID
+    turnspeed = AnglePid(angle,angle_Now);			//角度PID调整两轮差速到达目标方向
 
-motorCMD(forwardspeed-turnspeed,forwardspeed+turnspeed);
+    motorCMD(forwardspeed-turnspeed,forwardspeed+turnspeed);
 }
 
 
- /**
-  * @brief  PID 最小转弯
-  * @note		无前进速度 仅为绕自身旋转中心旋转
-  * @param  angle：给定角度,为正左转，为负右转
-  * @param  gospeed：基础速度
-  * @retval None
-  */
+/**
+ * @brief  PID 最小转弯
+ * @note		无前进速度 仅为绕自身旋转中心旋转
+ * @param  angle：给定角度,为正左转，为负右转
+ * @param  gospeed：基础速度
+ * @retval None
+ */
 //小动作 原地旋转
 void minimum_Turn(float angle)
 {
-	float getAngle=0.0f;
-	float speed=0.0f;
-	PID_param_angle[0]=55;// 转速10000除以转弯最大角度180 = 55
-	PID_param_angle[1]=0;
-	PID_param_angle[2]=0;
-	getAngle=GetAngle();
-	speed = AnglePid(angle,getAngle);	//根据角度PID算出转向的差速
-	motorCMD(speed,speed);
+    float getAngle=0.0f;
+    float speed=0.0f;
+    PID_param_angle[0]=55;// 转速10000除以转弯最大角度180 = 55
+    PID_param_angle[1]=0;
+    PID_param_angle[2]=0;
+    getAngle=GetAngle();
+    speed = AnglePid(angle,getAngle);	//根据角度PID算出转向的差速
+    motorCMD(speed,speed);
 }
 
 
 
- /**
-  * @brief  PID 前进转弯
-  * @note	
-  * @param  angle：给定角度,为正左转，为负右转
-  * @param  gospeed：基础速度
-  * @retval None
-  */
+/**
+ * @brief  PID 前进转弯
+ * @note
+ * @param  angle：给定角度,为正左转，为负右转
+ * @param  gospeed：基础速度
+ * @retval None
+ */
 //小动作 向前旋转
 void forward_Turn(float angle,float gospeed)
 {
-		float getAngle=0.0f;
-	float speed=0.0f;
-	PID_param_angle[0]=180;
-	
-	PID_param_angle[1]=0;
-	PID_param_angle[2]=0;
-	
-	getAngle=GetAngle();
-	speed = AnglePid(angle,getAngle);	//根据角度PID算出转向的差速
-	motorCMD(gospeed-speed,gospeed+speed);
+    float getAngle=0.0f;
+    float speed=0.0f;
+    PID_param_angle[0]=180;
+
+    PID_param_angle[1]=0;
+    PID_param_angle[2]=0;
+
+    getAngle=GetAngle();
+    speed = AnglePid(angle,getAngle);	//根据角度PID算出转向的差速
+    motorCMD(gospeed-speed,gospeed+speed);
 }
 
 
 
- /**
-  * @brief  PID 后退转弯
-  * @note	
-  * @param  angle：给定角度,为正左转，为负右转
-  * @param  gospeed：基础速度
-  * @retval None
-  */
+/**
+ * @brief  PID 后退转弯
+ * @note
+ * @param  angle：给定角度,为正左转，为负右转
+ * @param  gospeed：基础速度
+ * @retval None
+ */
 //小动作 倒行转弯
 void back_Turn(float angle,float gospeed)
 {
-	float getAngle=0.0f;
-	float speed=0.0f;
-	PID_param_angle[0]=gospeed/180;
-	PID_param_angle[1]=0;
-	PID_param_angle[2]=0;
-	
-	 getAngle=GetAngle();
-	 speed = AnglePid(angle,getAngle);	//根据角度PID算出转向的差速
-	motorCMD(gospeed-speed,gospeed+speed);
+    float getAngle=0.0f;
+    float speed=0.0f;
+    PID_param_angle[0]=gospeed/180;
+    PID_param_angle[1]=0;
+    PID_param_angle[2]=0;
+
+    getAngle=GetAngle();
+    speed = AnglePid(angle,getAngle);	//根据角度PID算出转向的差速
+    motorCMD(gospeed-speed,gospeed+speed);
 }
 
 
@@ -316,7 +316,7 @@ void back_Turn(float angle,float gospeed)
   * @note	前进速度可由距离PID调整  问题是两个PID不太好调  待调试后解决
   * @note 直线斜率为负值，存疑
 
-  * @param A1  
+  * @param A1
   * @param B1
   * @param C1
   * @param dir:为0 往上或右走，为1 往下或往左走
@@ -333,117 +333,117 @@ void back_Turn(float angle,float gospeed)
 
 uint8_t straightLine(float A1,float B1,float C1,uint8_t dir,float setSpeed)
 {
-	
-	fp32 setAngle=0;
-	fp32 angleAdd=0;
-	int	return_value=0;
-	fp32 getAngleNow=GetAngle();
-	fp32 getX=GetPosX();
-	fp32 getY=GetPosY();
-	float distance=((A1*getX)+(B1*getY)+C1)/sqrt((A1*A1)+(B1*B1));//当前点到目标直线距离
-	
+
+    fp32 setAngle=0;
+    fp32 angleAdd=0;
+    int	return_value=0;
+    fp32 getAngleNow=GetAngle();
+    fp32 getX=GetPosX();
+    fp32 getY=GetPosY();
+    float distance=((A1*getX)+(B1*getY)+C1)/sqrt((A1*A1)+(B1*B1));//当前点到目标直线距离
+
 //		PID_param_dis[0]=0.5f;
 //		PID_param_dis[0]=0;
 //		PID_param_dis[0]=0;
-	
-	PID_param_DisArc[0]=0.03;
-	PID_param_DisArc[1]=0;
-	PID_param_DisArc[2]=0;
-	
-	
-	angleAdd=Distance_Arc_Pid(distance);
-	//离直线35以内时表示到达直线
-		if((distance < 35) && (distance > -35))	//到达直线位置时用最小半径旋转调整为目标角度
-		{
-			angleAdd=0;
-			
-	//计算出直线角度，角度突变处理
-		if((B1 > -0.005f) && (B1 < 0.005f)) 
-	{
-		if(!dir)
-		{
-			setAngle=0;//目标角度为水平直线 方向由dir确定 0为右 1为左
-			minimum_Turn(setAngle+angleAdd);
-		}
-		else
-		{
-			if(A1 > 0)
-			{
-				setAngle=-180;			//目标角度为竖直直线 方向由dir确定 0为上 1为下
-				minimum_Turn(setAngle-angleAdd);//角度PID转向目标角度
-			}
-			else
-			{
-				 
-				setAngle=180;
-				minimum_Turn(setAngle+angleAdd);
-			}
-		}
-	}
-	else
-	{
-		if(!dir)
-		{
-			setAngle=(atan(-A1/B1)*180/PI)-90;
-			minimum_Turn(setAngle-angleAdd);
-		}
-		else
-		{
-			setAngle=(atan(-A1/B1)*180/PI)+90;
-			minimum_Turn(setAngle+angleAdd);
-		}
-		
-	}
-				return_value=1;
-	return return_value;
+
+    PID_param_DisArc[0]=0.03;
+    PID_param_DisArc[1]=0;
+    PID_param_DisArc[2]=0;
+
+
+    angleAdd=Distance_Arc_Pid(distance);
+    //离直线35以内时表示到达直线
+    if((distance < 35) && (distance > -35))	//到达直线位置时用最小半径旋转调整为目标角度
+    {
+        angleAdd=0;
+
+        //计算出直线角度，角度突变处理
+        if((B1 > -0.005f) && (B1 < 0.005f))
+        {
+            if(!dir)
+            {
+                setAngle=0;//目标角度为水平直线 方向由dir确定 0为右 1为左
+                minimum_Turn(setAngle+angleAdd);
+            }
+            else
+            {
+                if(A1 > 0)
+                {
+                    setAngle=-180;			//目标角度为竖直直线 方向由dir确定 0为上 1为下
+                    minimum_Turn(setAngle-angleAdd);//角度PID转向目标角度
+                }
+                else
+                {
+
+                    setAngle=180;
+                    minimum_Turn(setAngle+angleAdd);
+                }
+            }
+        }
+        else
+        {
+            if(!dir)
+            {
+                setAngle=(atan(-A1/B1)*180/PI)-90;
+                minimum_Turn(setAngle-angleAdd);
+            }
+            else
+            {
+                setAngle=(atan(-A1/B1)*180/PI)+90;
+                minimum_Turn(setAngle+angleAdd);
+            }
+
+        }
+        return_value=1;
+        return return_value;
+    }
+    else		//未到达目标直线距离范围内时，用前进转弯来接近目标直线
+    {
+        if((B1 > -0.005f) && (B1 < 0.005f))
+        {
+            if(!dir)
+            {
+                setAngle=0;//目标角度为竖直直线 方向由dir确定 0为右 1为左
+                forward_Turn(setAngle+angleAdd,setSpeed);
+            }
+            else
+            {
+                if(A1 > 0)
+                {
+                    setAngle=-180;			//目标角度为竖直直线 方向由dir确定 0为上 1为下
+                    forward_Turn(setAngle-angleAdd,setSpeed);//角度PID转向目标角度
+                }
+                else
+                {
+
+                    setAngle=180;
+                    forward_Turn(setAngle+angleAdd,setSpeed);
+                }
+            }
+        }
+        else
+        {
+            if(!dir)
+            {
+                setAngle=(atan(-A1/B1)*180/PI)-90;
+                forward_Turn(setAngle-angleAdd,setSpeed);
+            }
+            else
+            {
+                setAngle=(atan(-A1/B1)*180/PI)+90;
+                forward_Turn(setAngle+angleAdd,setSpeed);
+            }
+
+        }
+        return_value=0;
+        return return_value;
+    }
 }
-		else		//未到达目标直线距离范围内时，用前进转弯来接近目标直线
-		{
-		if((B1 > -0.005f) && (B1 < 0.005f))
-	{
-		if(!dir)
-		{
-			setAngle=0;//目标角度为竖直直线 方向由dir确定 0为右 1为左
-			forward_Turn(setAngle+angleAdd,setSpeed);
-		}
-		else
-		{
-			if(A1 > 0)
-			{
-				setAngle=-180;			//目标角度为竖直直线 方向由dir确定 0为上 1为下
-				forward_Turn(setAngle-angleAdd,setSpeed);//角度PID转向目标角度
-			}
-			else
-			{
-				 
-				setAngle=180;
-				forward_Turn(setAngle+angleAdd,setSpeed);
-			}
-		}
-	}
-	else
-	{
-		if(!dir)
-		{
-			setAngle=(atan(-A1/B1)*180/PI)-90;
-			forward_Turn(setAngle-angleAdd,setSpeed);
-		}
-		else
-		{
-			setAngle=(atan(-A1/B1)*180/PI)+90;
-			forward_Turn(setAngle+angleAdd,setSpeed);
-		}
-		
-	}
-						return_value=0;
-						return return_value; 
-}
-		}
 
 /**
   * @brief  底盘圆环路径
   * @note		直线斜率为负  存疑
-	* @note		思路为 直线距离增大角度差值 到达圆环轨迹后 直线-角度PID不再计算 仅计算角度PID 
+	* @note		思路为 直线距离增大角度差值 到达圆环轨迹后 直线-角度PID不再计算 仅计算角度PID
 	* @note		PID期望角度始终为当前行进位置指向圆心的方向
 	* @note		直线——角度PID，角度——角度参数调整完成后，可添加直线——距离PID 调整前进速度 使得底盘更快进入目标轨道
   * @param x：圆心x坐标
@@ -452,63 +452,63 @@ uint8_t straightLine(float A1,float B1,float C1,uint8_t dir,float setSpeed)
   * @param clock:为0 顺时针，为1 逆时针
   * @param v：速度
   * @retval None
-		
-		
+
+
 	* @note 大动作 输入目标圆环圆心的 x,y,以及圆环半径R。在目标圆环轨道上行驶 可通过坐标判断在直线的哪个位置
-	* @note 用到了距离-角度PID 来接近目标轨道 角度PID来保证沿着圆环轨道行驶 
+	* @note 用到了距离-角度PID 来接近目标轨道 角度PID来保证沿着圆环轨道行驶
   * @note 用到了两种小动作 离目标直线距离远时 用前进转弯来接近
   * @note 接近到达目标直线时原地旋转调整到目标方向 在用前进转弯来保持行驶直线
-		
-		
+
+
   */
 void closeRound(float x,float y,float R,float clock,float backspeed)
 {
-	float target_Distance=0;
-	float k=0;
-	float setangle=0,Agl=0,frontspeed=0;
-	target_Distance=sqrt(pow(GetPosX()-x,2)+pow(GetPosY()-y,2))-R;
-	k=(GetPosX()-x)/(y-GetPosY());		//前进直线斜率
+    float target_Distance=0;
+    float k=0;
+    float setangle=0,Agl=0,frontspeed=0;
+    target_Distance=sqrt(pow(GetPosX()-x,2)+pow(GetPosY()-y,2))-R;
+    k=(GetPosX()-x)/(y-GetPosY());		//前进直线斜率
 
-	PID_param_angle[0]=0.8f;
-	PID_param_angle[1]=0.0f;
-	PID_param_angle[2]=0.0f;
-	
-	PID_param_DisArc[0]=0.03;
-	PID_param_DisArc[1]=0;
-	PID_param_DisArc[2]=0;
+    PID_param_angle[0]=0.8f;
+    PID_param_angle[1]=0.0f;
+    PID_param_angle[2]=0.0f;
+
+    PID_param_DisArc[0]=0.03;
+    PID_param_DisArc[1]=0;
+    PID_param_DisArc[2]=0;
 //	顺1逆2
-	if(clock==1)
-	{
-		if(GetPosY()>y)
-		  Agl=-90+atan(k)*180/PI;
-	  else if(GetPosY()<y)
-		  Agl=90+atan(k)*180/PI;
-	  else if(GetPosY()==y&&GetPosX()>=x)
-		  Agl=180;
-	  else if(GetPosY()==y&&GetPosX()<x)
-		  Agl=0;
-		setangle=Agl+Distance_Arc_Pid(target_Distance);//距离赋值给角度的增量
-		frontspeed=AnglePid(setangle,GetAngle());//角度PID计算两轮速度差值
-	}
-	else if(clock==2)
-	{
-		if(GetPosY()>y)
-		  Agl=90+atan(k)*180/PI;
-	  else if(GetPosY()<y)
-		  Agl=-90+atan(k)*180/PI;
-	  else if(GetPosY()==y&&GetPosX()>=x)
-		  Agl=0;
-	  else if(GetPosY()==y&&GetPosX()<x)
-		  Agl=180;
-		setangle=Agl+Distance_Arc_Pid(target_Distance);//距离赋值给角度的增量
-		frontspeed=AnglePid(setangle,GetAngle());//角度PID计算两轮速度差值
-	}
-	motorCMD(1000-frontspeed,1000+frontspeed);//电机控制
+    if(clock==1)
+    {
+        if(GetPosY()>y)
+            Agl=-90+atan(k)*180/PI;
+        else if(GetPosY()<y)
+            Agl=90+atan(k)*180/PI;
+        else if(GetPosY()==y&&GetPosX()>=x)
+            Agl=180;
+        else if(GetPosY()==y&&GetPosX()<x)
+            Agl=0;
+        setangle=Agl+Distance_Arc_Pid(target_Distance);//距离赋值给角度的增量
+        frontspeed=AnglePid(setangle,GetAngle());//角度PID计算两轮速度差值
+    }
+    else if(clock==2)
+    {
+        if(GetPosY()>y)
+            Agl=90+atan(k)*180/PI;
+        else if(GetPosY()<y)
+            Agl=-90+atan(k)*180/PI;
+        else if(GetPosY()==y&&GetPosX()>=x)
+            Agl=0;
+        else if(GetPosY()==y&&GetPosX()<x)
+            Agl=180;
+        setangle=Agl+Distance_Arc_Pid(target_Distance);//距离赋值给角度的增量
+        frontspeed=AnglePid(setangle,GetAngle());//角度PID计算两轮速度差值
+    }
+    motorCMD(1000-frontspeed,1000+frontspeed);//电机控制
 }
 void VelCrl(unsigned char motorNum,int vel)//电机控制  点到点控制函数
 {
-if(motorNum=='1')
-	give_motor1(vel);
-if(motorNum=='2')
-	give_motor2(vel);
+    if(motorNum=='1')
+        give_motor1(vel);
+    if(motorNum=='2')
+        give_motor2(vel);
 }

@@ -1,5 +1,5 @@
 #ifndef _move_base_H
-#define _move_base_H
+#define _move_base_H	 
 #include <math.h>
 #include "pid.h"
 #include "sys.h"
@@ -16,6 +16,9 @@
 //º¯ÊýÉùÃ÷
 
 void set_point(u16 x,u16 y,u16 p);
+//u16 GetPosX(void);
+//u16 GetPosY(void);
+//u16 GetAngle(void);
 
 void ps2_move(void);
 void walk_point(void);
