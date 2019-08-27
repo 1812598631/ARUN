@@ -1,5 +1,6 @@
 
 #include "timer.h"
+#include "stdlib.h"
 
 
 u8 flag[2]={0,0};
@@ -298,7 +299,7 @@ void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
 			flag[0]=0;
 		}
 		else
-			TIM_Cmd(TIM2,ENABLE); //使能定时器2
+			TIM_Cmd(TIM2,DISABLE); //使能定时器2
 		if(abs(chassis_move_control_loop->motor_chassis[1].speed)>abs(chassis_move_control_loop->motor_chassis[1].speed_set)*0.6||
 			abs(chassis_move_control_loop->motor_chassis[1].speed)<abs(chassis_move_control_loop->motor_chassis[1].speed_set)*1.4)
 		{
@@ -306,7 +307,7 @@ void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
 			flag[1]=0;
 		}
 		else
-			TIM_Cmd(TIM3,ENABLE); //使能定时器3
+			TIM_Cmd(TIM3,DISABLE); //使能定时器3
 	
 	//计算pid
 	for (i = 0; i < 2; i++)

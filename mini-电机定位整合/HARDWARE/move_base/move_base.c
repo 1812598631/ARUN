@@ -24,6 +24,14 @@ int32_t motor_v2=0;
 //speedBase为基础前进速度
 void motorCMD(int32_t motor1,int32_t motor2)//电机控制 非点到点电机控制函数
 {
+		if(motor1>9000.0f)
+			motor1=9000;
+		if(motor2>9000.0f)
+			motor2=9000;
+		if(motor1<-9000.0f)
+			motor1=-9000;
+		if(motor2<-9000.0f)
+			motor2=-9000;
     give_motor1(motor1);
     give_motor2(-motor2);
 	
@@ -179,8 +187,10 @@ float DistancePid(float distance)
 float Distance_Arc_Pid(float distance)
 {
     float valueOut;
-    PID_Init(&PID_DisArc,PID_POSITION,PID_param_DisArc,90.0f,10.0f);//位置型PID初始化
+    PID_Init(&PID_DisArc,PID_POSITION,PID_param_DisArc,2000.0f,10.0f);//位置型PID初始化
     valueOut=PID_Calc(&PID_DisArc,distance,0);
+		LCD_ShowString(130,130,200,16,16,"ARCPID=");
+    LCD_ShowxNum(130,150,valueOut,6,16,0X80);
     return valueOut;
 }
 
@@ -210,8 +220,18 @@ float AnglePid(float valueSet,float valueNow)
     }
     PID_Init(&PID_angle,PID_POSITION,PID_param_angle,9000.0f,20.0f);//PID初始化
     valueOut=PID_Calc(&PID_angle,err,0);	//PID计算转弯差值
-		LCD_ShowString(100,130,200,16,16,"PID=");
-    LCD_ShowxNum(100,150,valueOut,6,16,0X80);
+		if(valueOut>0)
+		{
+		LCD_ShowString(130,170,200,16,16,"AnglePID=");
+		LCD_ShowString(120,190,200,16,16," ");
+    LCD_ShowxNum(130,190,valueOut,6,16,0X80);
+		}
+		else
+		{
+			LCD_ShowString(130,170,200,16,16,"AnglePID=");
+		LCD_ShowString(120,190,200,16,16,"-");
+    LCD_ShowxNum(130,190,-valueOut,6,16,0X80);
+		}
     return valueOut;
 }
 
@@ -452,7 +472,7 @@ uint8_t straightLine(float A1,float B1,float C1,uint8_t dir,float setSpeed)
   * @param x：圆心x坐标
   * @param y：圆心y坐标
   * @param R：半径
-  * @param clock:为0 顺时针，为1 逆时针
+  * @param clock:为1 顺时针，为2 逆时针
   * @param v：速度
   * @retval None
 
@@ -472,11 +492,11 @@ void closeRound(float x,float y,float R,float clock,float forwardspeed)
     target_Distance=sqrt(pow(GetPosX()-x,2)+pow(GetPosY()-y,2))-R;
     k=(GetPosX()-x)/(y-GetPosY());		//前进直线斜率
 
-    PID_param_angle[0]=0.8f;
+    PID_param_angle[0]=5.0f;
     PID_param_angle[1]=0.0f;
     PID_param_angle[2]=0.0f;
 
-    PID_param_DisArc[0]=0.03;
+    PID_param_DisArc[0]=5;
     PID_param_DisArc[1]=0;
     PID_param_DisArc[2]=0;
 //	顺1逆2
@@ -490,7 +510,9 @@ void closeRound(float x,float y,float R,float clock,float forwardspeed)
             Agl=180;
         else if(GetPosY()==y&&GetPosX()<x)
             Agl=0;
-        setangle=Agl+Distance_Arc_Pid(target_Distance);//距离赋值给角度的增量 Agl为角度转换常量
+        setangle=Agl-Distance_Arc_Pid(target_Distance);//距离赋值给角度的增量 Agl为角度转换常量
+	LCD_ShowString(130,50,200,16,16,"setAngle =");	
+	LCD_ShowxNum(130,70,setangle,6,16,0X80);
         frontspeed=AnglePid(setangle,GetAngle());//角度PID计算两轮速度差值
     }
     else if(clock==2)
@@ -503,7 +525,7 @@ void closeRound(float x,float y,float R,float clock,float forwardspeed)
             Agl=0;
         else if(GetPosY()==y&&GetPosX()<x)
             Agl=180;
-        setangle=Agl+Distance_Arc_Pid(target_Distance);//距离赋值给角度的增量
+        setangle=Agl-Distance_Arc_Pid(target_Distance);//距离赋值给角度的增量
         frontspeed=AnglePid(setangle,GetAngle());//角度PID计算两轮速度差值
     }
     motorCMD(forwardspeed-frontspeed,forwardspeed+frontspeed);//电机控制

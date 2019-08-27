@@ -65,7 +65,7 @@ fp32 PID_Calc(PidTypeDef *pid, fp32 ref, fp32 set)
     pid->error[1] = pid->error[0];
     pid->set = set;
     pid->fdb = ref;
-    pid->error[0] = set-ref;
+    pid->error[0] = ref-set;
 		
     if (pid->mode == PID_POSITION)
     {
@@ -91,8 +91,8 @@ fp32 PID_Calc(PidTypeDef *pid, fp32 ref, fp32 set)
         pid->out += pid->Pout + pid->Iout + pid->Dout;
         LimitMax(pid->out, pid->max_out);
     }
-				LCD_ShowString(150,190,200,16,16,"error=");	
-		LCD_ShowxNum(150,210,pid->out,6,16,0X80);
+//				LCD_ShowString(150,190,200,16,16,"error=");	
+//		LCD_ShowxNum(150,210,pid->out,6,16,0X80);
     return pid->out;
 }
 
@@ -124,7 +124,8 @@ fp32 PID_motor_Calc(PidTypeDef *pid, fp32 ref, fp32 set, char sign)
     {
         pid->Pout = pid->Kp * (pid->error[0] - pid->error[1]);
 			if(ref>=set*0.85||sign==1||ref<=set*1.15)
-        pid->Iout = pid->Ki * pid->error[0];
+//        pid->Iout = pid->Ki * pid->error[0];
+					pid->Iout = 0;
 			else 
 				pid->Iout = 0;
         pid->Dbuf[2] = pid->Dbuf[1];

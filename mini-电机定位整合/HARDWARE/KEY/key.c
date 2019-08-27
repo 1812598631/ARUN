@@ -8,7 +8,8 @@
 */
 u16 USART_RX_STA2 = 0; //����״̬���
 float PosX = 0, PosY;
-s16 PosAngle;
+s32 PosAngle;
+s16 PosAngle_temp = 0;
 u16 Distance;
 void MyusartInit2(u16 bound)
 {
@@ -143,9 +144,10 @@ void UART5_IRQHandler(void)
                 PosX = ConvertTo32(rebuf_3[4], rebuf_3[3], rebuf_3[2], rebuf_3[1]);
                 PosY = ConvertTo32(rebuf_3[8], rebuf_3[7], rebuf_3[6], rebuf_3[5]);
 
-                PosAngle = rebuf_3[10];
-                PosAngle <<= 8;//高八位
-                PosAngle |= rebuf_3[9];
+                PosAngle_temp = rebuf_3[10];
+                PosAngle_temp <<= 8;//高八位
+                PosAngle_temp |= rebuf_3[9];	
+								PosAngle=-(PosAngle_temp);
                 m = 0;
                 rebuf_3[0]=0;
             }
@@ -163,17 +165,19 @@ u16 Laser(u16 date)
 
 float GetPosX(void)
 {
-    return PosX;
+    return PosX/100;
 }
 float GetPosY(void)
 
 {
-    return PosY;
+    return PosY/100;
 }
 
-s16 GetAngle(void)
+float GetAngle(void)
 {
-    return PosAngle;
+	float angle_templ;
+	angle_templ=(float)PosAngle;
+return angle_templ/100;
 }
 
 void clear(void)

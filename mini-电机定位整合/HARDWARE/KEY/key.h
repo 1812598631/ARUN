@@ -30,7 +30,7 @@ u16 Laser(u16 date);
 void getXYP(void);
 float GetPosX(void);
 float GetPosY(void);
-s16 GetAngle(void);
+float GetAngle(void);
 void clear(void);
 void UART5_Send_Byte(u8 Data);//发送一个字节；
 void UART5_Send_String(u8 *Data); //发送字符串；
