@@ -187,7 +187,7 @@ float DistancePid(float distance)
 float Distance_Arc_Pid(float distance)
 {
     float valueOut;
-    PID_Init(&PID_DisArc,PID_POSITION,PID_param_DisArc,2000.0f,10.0f);//位置型PID初始化
+    PID_Init(&PID_DisArc,PID_POSITION,PID_param_DisArc,90.0f,10.0f);//位置型PID初始化
     valueOut=PID_Calc(&PID_DisArc,distance,0);
 		LCD_ShowString(130,130,200,16,16,"ARCPID=");
     LCD_ShowxNum(130,150,valueOut,6,16,0X80);
@@ -496,7 +496,7 @@ void closeRound(float x,float y,float R,float clock,float forwardspeed)
     PID_param_angle[1]=0.0f;
     PID_param_angle[2]=0.0f;
 
-    PID_param_DisArc[0]=5;
+    PID_param_DisArc[0]=0.03;
     PID_param_DisArc[1]=0;
     PID_param_DisArc[2]=0;
 //	顺1逆2
