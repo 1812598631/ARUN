@@ -143,9 +143,10 @@ void UART5_IRQHandler(void)
                 PosX = ConvertTo32(rebuf_3[4], rebuf_3[3], rebuf_3[2], rebuf_3[1]);
                 PosY = ConvertTo32(rebuf_3[8], rebuf_3[7], rebuf_3[6], rebuf_3[5]);
 
-                PosAngle = rebuf_3[10];
-                PosAngle <<= 8;//高八位
-                PosAngle |= rebuf_3[9];
+				PosAngle = rebuf_3[10];
+				PosAngle <<= 8;//高八位
+				PosAngle |= rebuf_3[9];
+					printf("%d",PosAngle);		
                 m = 0;
                 rebuf_3[0]=0;
             }

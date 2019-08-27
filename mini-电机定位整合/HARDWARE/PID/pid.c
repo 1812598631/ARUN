@@ -65,7 +65,7 @@ fp32 PID_Calc(PidTypeDef *pid, fp32 ref, fp32 set)
     pid->error[1] = pid->error[0];
     pid->set = set;
     pid->fdb = ref;
-    pid->error[0] = ref-set;
+    pid->error[0] = set-ref;
 		
     if (pid->mode == PID_POSITION)
     {

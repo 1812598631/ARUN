@@ -4,7 +4,6 @@
 
 u8 flag[2]={0,0};
 
-
 int32_t speed1,speed2;
 //底盘运动数据
 static int32_t wheel_speed[2];
@@ -147,6 +146,79 @@ void TIM4_IRQHandler(void)
 	}
 	TIM_ClearITPendingBit(TIM4,TIM_IT_Update);
 }
+
+
+///**
+//* @brief 距离PID
+//* @note	PID类型：位置型PID
+//* @param valueSet：距离设定值
+//* @param valueNow：当前距离值
+//* @retval 电机前进基础速度
+//* @attention
+//*/
+
+//float DistancePid(float distance)
+//{
+//    fp32 valueOut;
+//    PID_param_dis[0]=55;
+//    PID_param_dis[1]=0;
+//    PID_param_dis[2]=0;
+
+//    PID_Init(&PID_distance,PID_POSITION,PID_param_dis,9000.0f,1000.0f);//PID初始化
+//    valueOut=PID_Calc(&PID_distance,distance,0);
+//    return valueOut;
+//}
+
+
+
+
+///**
+//* @brief 距离对角度的增量PID
+//* @note	PID类型：位置型PID
+//* @param valueSet：距离设定值
+//* @param valueNow：当前距离值
+//* @retval 电机前进基础速度
+//* @attention
+//*/
+//float Distance_Arc_Pid(float distance)
+//{
+//    float valueOut;
+//    PID_Init(&PID_DisArc,PID_POSITION,PID_param_DisArc,90.0f,10.0f);//位置型PID初始化
+//    valueOut=PID_Calc(&PID_DisArc,distance,0);
+//    return valueOut;
+//}
+
+
+
+///**
+//* @brief 角度PID
+//* @note	PID类型：位置型PID
+//* @param valueSet：角度设定值
+//* @param valueNow：当前角度值
+//* @retval 电机速度差值
+//* @attention
+//*/
+//float AnglePid(float valueSet,float valueNow)
+//{
+//    float err=0;
+//    float valueOut=0;
+//    err=valueSet-valueNow;
+//    //角度突变处理
+//    if(err > 180)
+//    {
+//        err=err-360;
+//    }
+//    else if(err < -180)
+//    {
+//        err=360+err;
+//    }
+//    PID_Init(&PID_angle,PID_POSITION,PID_param_angle,10000.0f,180.0f);//PID初始化
+//    valueOut=PID_Calc(&PID_angle,err,0);	//PID计算转弯差值
+//    return valueOut;
+//}
+
+
+
 
 
 void PID_Move_Clear(chassis_move_t *chassis_move_clear)

@@ -485,7 +485,7 @@
             <File>
               <FileName>startup_stm32f10x_hd.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\C8T6\CORE\startup_stm32f10x_hd.s</FilePath>
+              <FilePath>..\CORE\startup_stm32f10x_hd.s</FilePath>
             </File>
           </Files>
         </Group>
