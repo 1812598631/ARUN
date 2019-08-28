@@ -29,6 +29,7 @@ float AnglePid(float valueSet,float valueNow);
 uint8_t straightLine(float A1,float B1,float C1,uint8_t dir,float setSpeed);
 void closeRound(float x,float y,float R,float clock,float backspeed);
 void motorCMD(int32_t motor1,int32_t motor2);
+void motor_back_CMD(int32_t motor1,int32_t motor2);//电机控制 非点到点电机控制函数
 
 
 #endif

@@ -169,6 +169,34 @@ PID参数繁多 难调
 ************************************************/
 
 
+/************************************************
+8-26
+目前待解决问题：
+
+圆环程序中角度PID 直接关系到在圆环上行驶速度
+距离-角度PID	关系到圆环的半径
+
+
+直线动作 两种直线前进 一种向前走直线 一种向后走直线 
+
+
+所有坐标系：
+
+
+  0				||			 0
+  | 			|| 			 |
+	| 			|| 			 |
+  | 			|| 			 |
+  | 			|| 			 |
+  | 			|| 			 |
++180			|| 			-180
+
+
+可能遇到的问题：
+
+刘展鹏考研！！！
+************************************************/
+
 
 
 /************************************************
@@ -178,6 +206,8 @@ PID参数繁多 难调
 
 int main(void)
 {
+	u8 state[5]={0};
+	u8 switch_state;
 //	 int32_t motor_v1=3000;
 //int32_t motor_v2=3000;
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);//设置中断优先级分组为组2：2位抢占优先级，2位响应优先级
@@ -219,7 +249,7 @@ int main(void)
         else
         {
             LCD_ShowString(60,50,200,16,16,"x=");
-					            LCD_ShowString(55,70,200,16,16," ");
+            LCD_ShowString(55,70,200,16,16," ");
 
             LCD_ShowxNum(60,70,Px,6,16,0X80);
         }
@@ -232,13 +262,13 @@ int main(void)
         else
         {
             LCD_ShowString(60,90,200,16,16,"y=");
-					            LCD_ShowString(55,110,200,16,16," ");
+            LCD_ShowString(55,110,200,16,16," ");
 
             LCD_ShowxNum(60,110,Py,6,16,0X80);
         }
         if(Pp<0)
-        {   
-					  LCD_ShowString(60,130,200,16,16,"Angle=");
+        {
+            LCD_ShowString(60,130,200,16,16,"Angle=");
             LCD_ShowString(55,150,200,16,16,"-");
             LCD_ShowxNum(60,150,-Pp,6,16,0X80);
         }
@@ -248,26 +278,46 @@ int main(void)
             LCD_ShowString(55,150,200,16,16," ");
             LCD_ShowxNum(60,150,Pp,6,16,0X80);
         }
-				printf("%d,",Pp);
-//LCD_ShowString(60,50,200,16,16,"x=");
-//LCD_ShowxNum(60,70,Px,6,16,0X80);
-//LCD_ShowString(60,90,200,16,16,"y=");
+//        printf("x:%fy:%fp:%f\n",Px,Py,Pp);
 //LCD_ShowxNum(60,110,Py,6,16,0X80);
 //LCD_ShowString(60,130,200,16,16,"Angle=");
 //LCD_ShowxNum(60,150,Pp,6,16,0X80);
 //		walk_point();		//点到点测试
-closeRound(0,2400,1500,1,1500);
+				if(switch_state==0&&state[0]==0)
+				 state[0]=straightLine(1,0,1000,0,1500);//
+if(state[0]==1)
+{
+	switch_state=1;
+}
+if(switch_state==1)
+		state[1]=straightLine(0,1,3000,0,1500);
+if(state[1]==1)
+	switch_state=2;
+if(switch_state==2)
+	state[2]=straightLine(1,0,-1400,1,1500);
+if(state[2]==1)
+{
+switch_state=3;
+}
+if(switch_state==3)
+{
+motorCMD(0,0);
+
+}
+LCD_ShowString(130,210,200,16,16,"switch_state=");
+LCD_ShowxNum(130,230,switch_state,6,16,0X80);
+        //closeRound(0,2400,1000,1,4000);
 //		laser_distance=Laser(0x44);
 //		LCD_ShowString(60,50,200,16,16,"distance=");
 //		LCD_ShowxNum(60,70,laser_distance,3,16,0X80);
 
 
-            //delay_ms(20);
+        //delay_ms(20);
 //		ps2_move();
 //		v=DistancePid(laser_distance);
 //		LCD_ShowString(60,90,200,16,16,"v=");
 //		LCD_ShowxNum(60,110,v,5,16,0X80);
 //	 		motorCMD(v,v);
 
-        }
     }
+}
