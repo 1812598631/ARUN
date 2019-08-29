@@ -194,7 +194,6 @@ PID参数繁多 难调
 
 可能遇到的问题：
 
-刘展鹏考研！！！
 ************************************************/
 
 
@@ -204,10 +203,13 @@ PID参数繁多 难调
 ************************************************/
 
 
+
 int main(void)
 {
 	u8 state[5]={0};
 	u8 switch_state;
+	u8 flag=1;
+	u8 clear_flag=0;
 //	 int32_t motor_v1=3000;
 //int32_t motor_v2=3000;
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);//设置中断优先级分组为组2：2位抢占优先级，2位响应优先级
@@ -235,11 +237,18 @@ int main(void)
 //give_motor2(motor_v2);
     delay_ms(5000);
     clear();
+
+
     while(1)
-    {
+   {
         Px=GetPosX();
         Py=GetPosY();
         Pp=GetAngle();
+//		 if(clear_flag==0)
+//		 {
+//			 clear();
+//			 clear_flag=1;
+//		 }
         if(Px<0)
         {
             LCD_ShowString(60,50,200,16,16,"x=");
@@ -278,46 +287,32 @@ int main(void)
             LCD_ShowString(55,150,200,16,16," ");
             LCD_ShowxNum(60,150,Pp,6,16,0X80);
         }
-//        printf("x:%fy:%fp:%f\n",Px,Py,Pp);
-//LCD_ShowxNum(60,110,Py,6,16,0X80);
-//LCD_ShowString(60,130,200,16,16,"Angle=");
-//LCD_ShowxNum(60,150,Pp,6,16,0X80);
-//		walk_point();		//点到点测试
-				if(switch_state==0&&state[0]==0)
-				 state[0]=straightLine(1,0,1000,0,1500);//
-if(state[0]==1)
-{
-	switch_state=1;
-}
-if(switch_state==1)
-		state[1]=straightLine(0,1,3000,0,1500);
-if(state[1]==1)
-	switch_state=2;
-if(switch_state==2)
-	state[2]=straightLine(1,0,-1400,1,1500);
-if(state[2]==1)
-{
-switch_state=3;
-}
-if(switch_state==3)
-{
-motorCMD(0,0);
+				
+				if((Px>1700&&Px<1800&&Py>1650&&Py<1750)||flag==0)
+			{
+				flag=0;
+			LCD_ShowString(60,250,200,16,16,"OK");
+//			closeRound(0,2200, 1000,1,1500,1);// 大圆：
 
-}
-LCD_ShowString(130,210,200,16,16,"switch_state=");
-LCD_ShowxNum(130,230,switch_state,6,16,0X80);
-        //closeRound(0,2400,1000,1,4000);
-//		laser_distance=Laser(0x44);
-//		LCD_ShowString(60,50,200,16,16,"distance=");
-//		LCD_ShowxNum(60,70,laser_distance,3,16,0X80);
+			straightLine(1,0,0,0,1500);
+			if(Px>-300&&Px<300)
+			{
+			flag=2;
+			LCD_ShowString(60,250,200,16,16,"step==3");
+			}
+			}
+			if(flag==1)
+			{
+				 closeRound(0,2200, 1500,1,3000,0);// 大圆：
+				 LCD_ShowString(60,250,200,16,16,"NO");
 
-
-        //delay_ms(20);
-//		ps2_move();
-//		v=DistancePid(laser_distance);
-//		LCD_ShowString(60,90,200,16,16,"v=");
-//		LCD_ShowxNum(60,110,v,5,16,0X80);
-//	 		motorCMD(v,v);
+			}
+			if(flag==2)
+				forward_Turn(0,-1500);
+//				straightLine(1,0,0,0,-1500);
+        printf("x:%fy:%fp:%f\n",Px,Py,Pp);
+			
+				
 
     }
 }

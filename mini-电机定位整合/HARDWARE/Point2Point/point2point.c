@@ -130,7 +130,7 @@ static float AngleClosedLoop(float presentAngle,float targetAngle,float vellP,fl
 {
 #define P1    10
 #define P2    5
-#define P3    25
+#define P3    0
 #define VRATE 1.0f
 		float angleErr = 0.0f;				
 	//目标角度与实际角度的差值开二次根

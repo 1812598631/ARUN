@@ -7,10 +7,12 @@
 
 */
 u16 USART_RX_STA2 = 0; //����״̬���
+//float PosX = 0, PosY;
 float PosX = 0, PosY;
 s32 PosAngle;
 s16 PosAngle_temp = 0;
 u16 Distance;
+
 void MyusartInit2(u16 bound)
 {
     USART_InitTypeDef USART_InitStruct1; //��������1�ṹ�����
@@ -121,6 +123,41 @@ void USART2_IRQHandler(void)
 }
 
 
+//void UART5_IRQHandler(void)
+//{
+//    static uint8_t m = 0,rebuf_3[9] = {0};
+//    if(USART_GetITStatus(UART5, USART_IT_RXNE) != RESET)
+//    {
+//        rebuf_3[m] = USART_ReceiveData(UART5);
+//        m++;
+//        if (rebuf_3[0]!= 0xaa)
+//        {
+//            m = 0;
+//            rebuf_3[0] = 0;
+//        }
+//        if (rebuf_3[m-1]==0x55)
+//        {
+//        }
+//        else {
+//            if(m==8)
+//            {
+//                PosX = rebuf_3[1];
+//								PosX <<=8;
+//								PosX|=rebuf_3[2];
+//                PosY = rebuf_3[3];
+//								PosY <<=8;
+//								PosY|=rebuf_3[4];
+//                PosAngle_temp = rebuf_3[5];
+//                PosAngle_temp <<= 8;//高八位
+//                PosAngle_temp |= rebuf_3[6];	
+//								PosAngle=-(PosAngle_temp);
+//                m = 0;
+//                rebuf_3[0]=0;
+//            }
+//        }
+//    }
+//}
+
 
 
 void UART5_IRQHandler(void)
@@ -154,6 +191,8 @@ void UART5_IRQHandler(void)
         }
     }
 }
+
+
 u16 Laser(u16 date)
 {
     USART_SendData(USART2, date);
