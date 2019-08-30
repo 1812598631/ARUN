@@ -27,20 +27,16 @@ Project File Date:  08/27/2019
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'g:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'KEY'
-compiling main.c...
-main.c(209): warning:  #177-D: variable "state"  was declared but never referenced
-  	u8 state[5]={0};
-main.c(210): warning:  #177-D: variable "switch_state"  was declared but never referenced
-  	u8 switch_state;
-main.c(212): warning:  #177-D: variable "clear_flag"  was declared but never referenced
-  	u8 clear_flag=0;
-main.c(18): warning:  #177-D: variable "laser_distance"  was declared but never referenced
-  static float laser_distance;
-main.c: 4 warnings, 0 errors
+compiling move_base.c...
+..\HARDWARE\KEY\key.h(37): warning:  #1295-D: Deprecated declaration button_init - give arg types
+  void button_init();
+..\HARDWARE\move_base\move_base.c(694): warning:  #1-D: last line of file ends without a newline
+          }
+..\HARDWARE\move_base\move_base.c: 2 warnings, 0 errors
 linking...
-Program Size: Code=60018 RO-data=7254 RW-data=220 ZI-data=2580  
+Program Size: Code=56598 RO-data=7074 RW-data=224 ZI-data=2584  
 FromELF: creating hex file...
-"..\OBJ\KEY.axf" - 0 Error(s), 4 Warning(s).
+"..\OBJ\KEY.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -54,7 +50,7 @@ Package Vendor: Keil
   g:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include
 
 <h2>Collection of Component Files used:</h2>
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:02
 </pre>
 </body>
 </html>

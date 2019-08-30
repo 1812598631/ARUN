@@ -13,6 +13,57 @@ s32 PosAngle;
 s16 PosAngle_temp = 0;
 u16 Distance;
 
+void button_init()
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);//使能PE端时钟
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;                // HWBZ-->PE1 端口配置
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;        // 上拉输入
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;         //IO口速度为50MHz
+    GPIO_Init(GPIOB,&GPIO_InitStructure);                        //根据参数设定初始化GPIOE1
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;                // HWBZ-->PE1 端口配置
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;        // 上拉输入
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;         //IO口速度为50MHz
+    GPIO_Init(GPIOB,&GPIO_InitStructure);                        //根据参数设定初始化GPIOE1
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;                // HWBZ-->PE1 端口配置
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;        // 上拉输入
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;         //IO口速度为50MHz
+    GPIO_Init(GPIOB,&GPIO_InitStructure);                        //根据参数设定初始化GPIOE1
+	
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;                // HWBZ-->PE1 端口配置
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;        // 上拉输入
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;         //IO口速度为50MHz
+    GPIO_Init(GPIOB,&GPIO_InitStructure);                        //根据参数设定初始化GPIOE1
+		
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;                // HWBZ-->PE1 端口配置
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;        // 上拉输入
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;         //IO口速度为50MHz
+    GPIO_Init(GPIOB,&GPIO_InitStructure);                        //根据参数设定初始化GPIOE1
+		
+		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;                // HWBZ-->PE1 端口配置
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;        // 上拉输入
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;         //IO口速度为50MHz
+    GPIO_Init(GPIOB,&GPIO_InitStructure);                        //根据参数设定初始化GPIOE1
+		
+		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;                // HWBZ-->PE1 端口配置
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;        // 上拉输入
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;         //IO口速度为50MHz
+    GPIO_Init(GPIOB,&GPIO_InitStructure);                        //根据参数设定初始化GPIOE1
+		
+		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7;                // HWBZ-->PE1 端口配置
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;        // 上拉输入
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;         //IO口速度为50MHz
+    GPIO_Init(GPIOB,&GPIO_InitStructure);                        //根据参数设定初始化GPIOE1
+		
+		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;                // HWBZ-->PE1 端口配置
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;        // 上拉输入
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;         //IO口速度为50MHz
+    GPIO_Init(GPIOB,&GPIO_InitStructure);                        //根据参数设定初始化GPIOE1
+}
 void MyusartInit2(u16 bound)
 {
     USART_InitTypeDef USART_InitStruct1; //��������1�ṹ�����
@@ -149,7 +200,7 @@ void USART2_IRQHandler(void)
 //								PosY|=rebuf_3[4];
 //                PosAngle_temp = rebuf_3[5];
 //                PosAngle_temp <<= 8;//高八位
-//                PosAngle_temp |= rebuf_3[6];	
+//                PosAngle_temp |= rebuf_3[6];
 //								PosAngle=-(PosAngle_temp);
 //                m = 0;
 //                rebuf_3[0]=0;
@@ -183,8 +234,8 @@ void UART5_IRQHandler(void)
 
                 PosAngle_temp = rebuf_3[10];
                 PosAngle_temp <<= 8;//高八位
-                PosAngle_temp |= rebuf_3[9];	
-								PosAngle=-(PosAngle_temp);
+                PosAngle_temp |= rebuf_3[9];
+                PosAngle=-(PosAngle_temp);
                 m = 0;
                 rebuf_3[0]=0;
             }
@@ -214,9 +265,9 @@ float GetPosY(void)
 
 float GetAngle(void)
 {
-	float angle_templ;
-	angle_templ=(float)PosAngle;
-return angle_templ/100;
+    float angle_templ;
+    angle_templ=(float)PosAngle;
+    return angle_templ/100;
 }
 
 void clear(void)

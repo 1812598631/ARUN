@@ -416,7 +416,7 @@ void back_Turn(float angle,float gospeed)
 
     getAngle=GetAngle();
     speed = AnglePid(angle,getAngle);	//根据角度PID算出转向的差速
-    motor_back_CMD(gospeed-speed,gospeed+speed);
+    motor_back_CMD(-(gospeed-speed),-(gospeed+speed));
 }
 
 
@@ -555,9 +555,9 @@ void closeRound(float x,float y,float R,float clock,float forwardspeed,u8 Rounds
 
 	if(Roundsize==0)//大圈
 	{
-    PID_param_angle[0]=30.0f;
+    PID_param_angle[0]=40.0f;
     PID_param_angle[1]=0.0f;
-    PID_param_angle[2]=0.0f;
+    PID_param_angle[2]=10.0f;
 
     PID_param_DisArc[0]=0.05;
     PID_param_DisArc[1]=0;
@@ -660,3 +660,35 @@ void VelCrl(unsigned char motorNum,int vel)//电机控制  点到点控制函数
 		}
 		}
 }
+void Round_shoot(void )
+{
+	u8 flag_step=0;
+	fp32 Px,Py;
+	float Pp;
+				Px=GetPosX();
+        Py=GetPosY();
+        Pp=GetAngle();
+	if(flag_step==0)//走形第一阶段 走大圆
+            {
+                closeRound(0,2200, 1500,1,4000,0);// 大圆：
+                LCD_ShowString(60,250,200,16,16,"NO");
+            }
+if((Px>1700&&Px<1800&&Py>1650&&Py<1750)||flag_step==1)	//到达标志点附近 切换阶段 第二阶段撞边
+            {
+                flag_step=1;
+                LCD_ShowString(60,250,200,16,16,"OK");
+                straightLine(1,0,0,0,1500);
+                if(Px>-200&&Px<200&&Pp>-20&&Pp<20&&Py>1600&&Py<1800)//到达中边框附近 切换阶段 第三阶段靠边
+                {
+                    flag_step=2;
+                    LCD_ShowString(60,250,200,16,16,"step==3");
+                }
+            }
+
+            if(flag_step==2)
+						{
+							back_Turn(0,1500);
+							if(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_13)&&GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_14))
+								;
+						}
+        }
