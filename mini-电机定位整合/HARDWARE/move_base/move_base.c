@@ -383,10 +383,9 @@ void forward_Turn(float angle,float gospeed)
     float getAngle=0.0f;
     float speed=0.0f;
 
-	
-    PID_param_angle[0]=55;
+    PID_param_angle[0]=15;
     PID_param_angle[1]=0;
-    PID_param_angle[2]=0;
+    PID_param_angle[2]=5;
 
     getAngle=GetAngle();
     speed = AnglePid(angle,getAngle);	//根据角度PID算出转向的差速
@@ -455,7 +454,7 @@ uint8_t straightLine(float A1,float B1,float C1,uint8_t dir,float setSpeed)
 
     PID_param_DisArc[0]=0.15;
     PID_param_DisArc[1]=0;
-    PID_param_DisArc[2]=0;
+    PID_param_DisArc[2]=1;
 
 
     angleAdd=Distance_Arc_Pid(distance);
@@ -629,35 +628,35 @@ void VelCrl(unsigned char motorNum,int vel)//电机控制  点到点控制函数
 		{
         give_motor1(vel);
 
-		if(vel>0)
-		{
-    LCD_ShowString(60,170,200,16,16,"V left=");
-    LCD_ShowxNum(60,190,vel,6,16,0X80);
-		}
-		else
-		{
-		
-		LCD_ShowString(60,170,200,16,16,"V left=");
-    		LCD_ShowString(60,190,200,16,16,"-");
-			LCD_ShowxNum(60,190,-vel,6,16,0X80);	
-		}
+//		if(vel>0)
+//		{
+//    LCD_ShowString(60,170,200,16,16,"V left=");
+//    LCD_ShowxNum(60,190,vel,6,16,0X80);
+//		}
+//		else
+//		{
+//		
+//		LCD_ShowString(60,170,200,16,16,"V left=");
+//    		LCD_ShowString(60,190,200,16,16,"-");
+//			LCD_ShowxNum(60,190,-vel,6,16,0X80);	
+//		}
 		}
     if(motorNum==2)
 		{
         give_motor2(vel);
 				
-		if(vel>0)
-		{
-    LCD_ShowString(60,210,200,16,16,"V right=");
-    LCD_ShowxNum(60,230,vel,6,16,0X80);
-		}
-		else
-		{
-		
-		LCD_ShowString(60,210,200,16,16,"V right=");
-    		LCD_ShowString(60,210,200,16,16,"-");
-			LCD_ShowxNum(60,230,-vel,6,16,0X80);	
-		}
+//		if(vel>0)
+//		{
+//		LCD_ShowString(60,210,200,16,16,"V right=");
+//		LCD_ShowxNum(60,230,vel,6,16,0X80);
+//		}
+//		else
+//		{
+//		
+//		LCD_ShowString(60,210,200,16,16,"V right=");
+//				LCD_ShowString(60,210,200,16,16,"-");
+//			LCD_ShowxNum(60,230,-vel,6,16,0X80);	
+//		}
 		}
 }
 void Round_shoot(void )
@@ -668,7 +667,7 @@ void Round_shoot(void )
 				Px=GetPosX();
         Py=GetPosY();
         Pp=GetAngle();
-	if(flag_step==0)//走形第一阶段 走大圆
+if(flag_step==0)//走形第一阶段 走大圆
             {
                 closeRound(0,2200, 1500,1,4000,0);// 大圆：
                 LCD_ShowString(60,250,200,16,16,"NO");

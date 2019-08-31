@@ -314,24 +314,24 @@ int main(void)
                 LCD_ShowString(55,150,200,16,16," ");
                 LCD_ShowxNum(60,150,Pp,6,16,0X80);
             }
-//            if(flag_step==0)//走形第一阶段 走大圆
-//            {
-//                closeRound(0,2200, 1500,1,4000,0);// 大圆：
-//                LCD_ShowString(60,250,200,16,16,"NO");
+            if(flag_step==0)//走形第一阶段 走大圆
+            {
+//                closeRound(0,2200, 1700,1,3500,0);// 大圆：
+							  back_Turn(0,1500);
+                LCD_ShowString(60,250,200,16,16,"step==1");
 
-//            }
-//            if((Px>1700&&Px<1800&&Py>1650&&Py<1750)||flag_step==1)	//到达标志点附近 切换阶段 第二阶段撞边
+            }
+//            if((Px>1400&&Px<1600&&Py>300&&Py<1200)||flag_step==1)	//到达标志点附近 切换阶段 第二阶段撞边
 //            {
 //                flag_step=1;
-//                LCD_ShowString(60,250,200,16,16,"OK");
-//                straightLine(1,0,0,0,1500);
+//                LCD_ShowString(60,250,200,16,16,"step==2");
+//                straightLine(1,0,0,0,3000);
 //                if(Px>-200&&Px<200&&Pp>-20&&Pp<20&&Py>1600&&Py<1800)//到达中边框附近 切换阶段 第三阶段靠边
 //                {
 //                    flag_step=2;
 //                    LCD_ShowString(60,250,200,16,16,"step==3");
 //                }
 //            }
-
 //            if(flag_step==2)
 //						{
 //							back_Turn(0,1500);
