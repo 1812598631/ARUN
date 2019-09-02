@@ -35,10 +35,28 @@ void motorCMD(int32_t motor1,int32_t motor2)//µç»ú¿ØÖÆ ·Çµãµ½µãµç»ú¿ØÖÆº¯Êý
     give_motor1(motor1);
     give_motor2(-motor2);
 
+		if(motor1>0)
+		{
     LCD_ShowString(60,170,200,16,16,"V left=");
     LCD_ShowxNum(60,190,motor1,6,16,0X80);
+		}
+		else
+		{
+		
+		LCD_ShowString(60,170,200,16,16,"V left=");
+    		LCD_ShowString(60,190,200,16,16,"-");
+			LCD_ShowxNum(60,190,-motor1,6,16,0X80);	
+		}
+		if(motor2>0)
+		{
     LCD_ShowString(60,210,200,16,16,"V right=");
     LCD_ShowxNum(60,230,motor2,6,16,0X80);
+		}
+		else{
+		LCD_ShowString(60,210,200,16,16,"V right=");
+		LCD_ShowString(60,210,200,16,16,"-");
+    LCD_ShowxNum(60,230,-motor2,6,16,0X80);
+		}
 }
 
 
@@ -57,9 +75,9 @@ void motor_back_CMD(int32_t motor1,int32_t motor2)//µç»ú¿ØÖÆ ·Çµãµ½µãµç»ú¿ØÖÆº¯Ê
     give_motor2(-motor1);
 
     LCD_ShowString(60,170,200,16,16,"V left=");
-    LCD_ShowxNum(60,190,motor1,6,16,0X80);
+    LCD_ShowxNum(60,190,motor2,6,16,0X80);
     LCD_ShowString(60,210,200,16,16,"V right=");
-    LCD_ShowxNum(60,230,motor2,6,16,0X80);
+    LCD_ShowxNum(60,230,motor1,6,16,0X80);
 }
 
 
@@ -156,13 +174,59 @@ void ps2_move()
         PID_Move_Clear(&chassis_move);
     }
 }
-void walk_point(void)
+void walk_point(int x,int y, int p)
 {
     presentline.point.x=GetPosX();
-    presentline.point.x=GetPosY();
-    presentline.point.x=GetAngle();
-    set_point(0,1000,0);//ÉèÖÃÄ¿±êµã	x,y,p
-    MvByLine(presentline,  targetline, 10000);
+    presentline.point.y=GetPosY();
+    presentline.angle=GetAngle();
+		targetline.point.x=x;
+    targetline.point.y=y;
+    targetline.angle=p;//ÉèÖÃÄ¿±êµã	x,y,p
+	
+	
+	
+	if(targetline.point.x<0)
+        {
+            LCD_ShowString(120,50,200,16,16,"x=");
+            LCD_ShowString(115,70,200,16,16,"-");
+            LCD_ShowxNum(120,70,-targetline.point.x,3,16,0X80);
+        }
+        else
+        {
+            LCD_ShowString(120,50,200,16,16,"x=");
+            LCD_ShowString(115,70,200,16,16," ");
+
+            LCD_ShowxNum(120,70,targetline.point.x,3,16,0X80);
+        }
+        if(y<0)
+        {
+            LCD_ShowString(120,90,200,16,16,"y=");
+            LCD_ShowString(115,110,200,16,16,"-");
+            LCD_ShowxNum(120,110,-targetline.point.y,3,16,0X80);
+        }
+        else
+        {
+            LCD_ShowString(120,90,200,16,16,"y=");
+            LCD_ShowString(115,110,200,16,16," ");
+
+            LCD_ShowxNum(120,110,targetline.point.y,3,16,0X80);
+        }
+        if(p<0)
+        {
+            LCD_ShowString(120,130,200,16,16,"Angle=");
+            LCD_ShowString(115,150,200,16,16,"-");
+            LCD_ShowxNum(120,150,-targetline.angle,3,16,0X80);
+        }
+        else
+        {
+            LCD_ShowString(120,130,200,16,16,"Angle=");
+            LCD_ShowString(115,150,200,16,16," ");
+            LCD_ShowxNum(120,150,targetline.angle,3,16,0X80);
+        }
+				
+				
+				
+    MvByLine(presentline,targetline, 1000);
 }
 
 
@@ -319,10 +383,9 @@ void forward_Turn(float angle,float gospeed)
     float getAngle=0.0f;
     float speed=0.0f;
 
-	
     PID_param_angle[0]=15;
     PID_param_angle[1]=0;
-    PID_param_angle[2]=0;
+    PID_param_angle[2]=5;
 
     getAngle=GetAngle();
     speed = AnglePid(angle,getAngle);	//¸ù¾Ý½Ç¶ÈPIDËã³ö×ªÏòµÄ²îËÙ
@@ -346,13 +409,13 @@ void back_Turn(float angle,float gospeed)
 {
     float getAngle=0.0f;
     float speed=0.0f;
-    PID_param_angle[0]=gospeed/180;
+    PID_param_angle[0]=5;
     PID_param_angle[1]=0;
     PID_param_angle[2]=0;
 
     getAngle=GetAngle();
     speed = AnglePid(angle,getAngle);	//¸ù¾Ý½Ç¶ÈPIDËã³ö×ªÏòµÄ²îËÙ
-    motorCMD(gospeed-speed,gospeed+speed);
+    motor_back_CMD(-(gospeed-speed),-(gospeed+speed));
 }
 
 
@@ -389,9 +452,9 @@ uint8_t straightLine(float A1,float B1,float C1,uint8_t dir,float setSpeed)
 //		PID_param_dis[0]=0;
 //		PID_param_dis[0]=0;
 
-    PID_param_DisArc[0]=0.08;
+    PID_param_DisArc[0]=0.15;
     PID_param_DisArc[1]=0;
-    PID_param_DisArc[2]=0;
+    PID_param_DisArc[2]=1;
 
 
     angleAdd=Distance_Arc_Pid(distance);
@@ -477,6 +540,9 @@ uint8_t straightLine(float A1,float B1,float C1,uint8_t dir,float setSpeed)
   * @note ½Ó½üµ½´ïÄ¿±êÖ±ÏßÊ±Ô­µØÐý×ªµ÷Õûµ½Ä¿±ê·½Ïò ÔÚÓÃÇ°½ø×ªÍäÀ´±£³ÖÐÐÊ»Ö±Ïß
 
 
+  * @note PIDµ÷²ÎÊ±  ½Ç¶ÈPID 
+
+
   */
 void closeRound(float x,float y,float R,float clock,float forwardspeed,u8 Roundsize)
 {
@@ -486,39 +552,38 @@ void closeRound(float x,float y,float R,float clock,float forwardspeed,u8 Rounds
     target_Distance=sqrt(pow(GetPosX()-x,2)+pow(GetPosY()-y,2))-R;
     k=(GetPosX()-x)/(y-GetPosY());		//Ç°½øÖ±ÏßÐ±ÂÊ
 
-	if(Roundsize==2)//´óÈ¦
+	if(Roundsize==0)//´óÈ¦
 	{
-    PID_param_angle[0]=30.0f;
+    PID_param_angle[0]=40.0f;
+    PID_param_angle[1]=0.0f;
+    PID_param_angle[2]=10.0f;
+
+    PID_param_DisArc[0]=0.05;
+    PID_param_DisArc[1]=0;
+    PID_param_DisArc[2]=0;
+	}
+		if(Roundsize==1)//ÖÐÈ¦
+{
+    PID_param_angle[0]=45.0f;
     PID_param_angle[1]=0.0f;
     PID_param_angle[2]=0.0f;
 
     PID_param_DisArc[0]=0.05;
     PID_param_DisArc[1]=0;
     PID_param_DisArc[2]=0;
-//	Ë³1Äæ2
 	}
-		if(Roundsize==2)//´óÈ¦
+if(Roundsize==2)//Ð¡È¦
 {
     PID_param_angle[0]=30.0f;
     PID_param_angle[1]=0.0f;
     PID_param_angle[2]=0.0f;
 
-    PID_param_DisArc[0]=0.05;
+    PID_param_DisArc[0]=0.03;
     PID_param_DisArc[1]=0;
     PID_param_DisArc[2]=0;
-//	Ë³1Äæ2
 	}
-if(Roundsize==2)//´óÈ¦
-{
-    PID_param_angle[0]=30.0f;
-    PID_param_angle[1]=0.0f;
-    PID_param_angle[2]=0.0f;
 
-    PID_param_DisArc[0]=0.05;
-    PID_param_DisArc[1]=0;
-    PID_param_DisArc[2]=0;
 //	Ë³1Äæ2
-	}
     if(clock==1)
     {
         if(GetPosY()>y)
@@ -559,8 +624,70 @@ if(Roundsize==2)//´óÈ¦
 }
 void VelCrl(unsigned char motorNum,int vel)//µç»ú¿ØÖÆ  µãµ½µã¿ØÖÆº¯Êý
 {
-    if(motorNum=='1')
+    if(motorNum==1)
+		{
         give_motor1(vel);
-    if(motorNum=='2')
+
+//		if(vel>0)
+//		{
+//    LCD_ShowString(60,170,200,16,16,"V left=");
+//    LCD_ShowxNum(60,190,vel,6,16,0X80);
+//		}
+//		else
+//		{
+//		
+//		LCD_ShowString(60,170,200,16,16,"V left=");
+//    		LCD_ShowString(60,190,200,16,16,"-");
+//			LCD_ShowxNum(60,190,-vel,6,16,0X80);	
+//		}
+		}
+    if(motorNum==2)
+		{
         give_motor2(vel);
+				
+//		if(vel>0)
+//		{
+//		LCD_ShowString(60,210,200,16,16,"V right=");
+//		LCD_ShowxNum(60,230,vel,6,16,0X80);
+//		}
+//		else
+//		{
+//		
+//		LCD_ShowString(60,210,200,16,16,"V right=");
+//				LCD_ShowString(60,210,200,16,16,"-");
+//			LCD_ShowxNum(60,230,-vel,6,16,0X80);	
+//		}
+		}
 }
+void Round_shoot(void )
+{
+	u8 flag_step=0;
+	fp32 Px,Py;
+	float Pp;
+				Px=GetPosX();
+        Py=GetPosY();
+        Pp=GetAngle();
+if(flag_step==0)//×ßÐÎµÚÒ»½×¶Î ×ß´óÔ²
+            {
+                closeRound(0,2200, 1500,1,4000,0);// ´óÔ²£º
+                LCD_ShowString(60,250,200,16,16,"NO");
+            }
+if((Px>1700&&Px<1800&&Py>1650&&Py<1750)||flag_step==1)	//µ½´ï±êÖ¾µã¸½½ü ÇÐ»»½×¶Î µÚ¶þ½×¶Î×²±ß
+            {
+                flag_step=1;
+                LCD_ShowString(60,250,200,16,16,"OK");
+                straightLine(1,0,0,0,1500);
+                if(Px>-200&&Px<200&&Pp>-20&&Pp<20&&Py>1600&&Py<1800)//µ½´ïÖÐ±ß¿ò¸½½ü ÇÐ»»½×¶Î µÚÈý½×¶Î¿¿±ß
+                {
+                    flag_step=2;
+                    LCD_ShowString(60,250,200,16,16,"step==3");
+                }
+            }
+
+            if(flag_step==2)
+						{
+							back_Turn(0,1500);
+							if(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_13)&&GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_14))
+								;
+						}
+        }

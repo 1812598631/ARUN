@@ -20,6 +20,7 @@
 #define USART_REC_LEN_2  			200  	//定义最大接收字节数 200
 #define USART_REC_LEN_3  			200  	//定义最大接收字节数 200
 
+
 extern u8  USART_RX_BUF2[USART_REC_LEN_2]; //接收缓冲,最大USART_REC_LEN个字节.末字节为换行符
 extern u16 USART_RX_STA2;         		//接收状态标记
 
@@ -27,15 +28,18 @@ extern u8  USART_RX_BUF3[USART_REC_LEN_3]; //接收缓冲,最大USART_REC_LEN个字节.末
 extern u16 USART_RX_STA3;         		//接收状态标记
 
 u16 Laser(u16 date);
+u8 aim_tub1(void);
+u8 aim_tub2(void);
 void getXYP(void);
 float GetPosX(void);
 float GetPosY(void);
 float GetAngle(void);
 void clear(void);
+void UART2_Send_Byte(u8 Data);
 void UART5_Send_Byte(u8 Data);//发送一个字节；
 void UART5_Send_String(u8 *Data); //发送字符串；
-void button_init();
-void MyusartInit2(u16);
+void button_init(void);
+void MyusartInit2(u32);
 void MyusartInit5(u32);
 //void DMA_Configuration(void);
 unsigned long strtou32(char *str);

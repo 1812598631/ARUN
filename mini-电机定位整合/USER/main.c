@@ -15,7 +15,6 @@
 
 
 #define PI (3.141593f)
-static float laser_distance;
 fp32 Px,Py;
 float Pp;
 fp32 v;
@@ -197,7 +196,31 @@ PID参数繁多 难调
 
 ************************************************/
 
+/************************************************
+9-1更新
+射球与底盘串口通讯
 
+四个框以及红蓝队开关均为射球读取
+
+底盘——>射球 红队 a:34边 b:32边 c:21边 d:14边	蓝队a:12边 b:23边 c:34边 d:14边
+射球——>底盘	帧头0x55 
+										 左激光高八位 低八位 右激光高八位 右激光低八位 
+										 抽签决定的第一个筒的序号：红队为 1234 蓝队为5678 对应(1234)
+										 抽签决定的第二个筒的序号：红队为 1234 蓝队为5678 对应(1234)
+						帧尾0xaa
+红蓝两队坐标系对应的四个桶的坐标为
+int32_t aim_tub1_red[2]={-2000,4200};		//700mm
+int32_t aim_tub2_red[2]={2000,4200};			//900mm
+int32_t aim_tub3_red[2]={2000,0};	//800mm
+int32_t aim_tub4_red[2]={-2000,0};	//1000mm
+
+int32_t aim_tub1_blue[2]={2000,0};		//700mm
+int32_t aim_tub2_blue[2]={-2000,0};			//900mm
+int32_t aim_tub3_blue[2]={-2000,4200};	//800mm
+int32_t aim_tub4_blue[2]={2000,4200};	//1000mm
+
+
+************************************************/
 
 /************************************************
 作者：阿RUN @SAU——科协
@@ -211,6 +234,9 @@ int main(void)
     u8 switch_state;
     u8 flag_step=0;//行走阶段标志
     u8 clear_flag=0;
+		
+		u8 shoot_tub1=0;
+		u8 shoot_tub2=0;
 //    u8 PS2_flag=0;//PS2标志
 //		u8 PS2_LX,PS2_LY,PS2_RY,PS2_RX,PS2_KEY;
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);//设置中断优先级分组为组2：2位抢占优先级，2位响应优先级
@@ -218,8 +244,9 @@ int main(void)
 
 
     delay_init();//延时函数初始化
-    MyusartInit2(19200);//串口2
+    MyusartInit2(115200);//串口2
     MyusartInit5(115200);
+		
     LCD_Init();
 
     CAN1_Mode_Init(CAN_SJW_1tq, CAN_BS2_3tq, CAN_BS1_8tq, 3, CAN_Mode_Normal);  //CAN初始化模式,波特率1Mbps
@@ -241,6 +268,7 @@ int main(void)
         Py=GetPosY();
         Pp=GetAngle();
 			
+			
 			Round_shoot();
 //				PS2_LX=PS2_AnologData(PSS_LX);    
 //				PS2_LY=PS2_AnologData(PSS_LY);
@@ -253,29 +281,6 @@ int main(void)
 //                LCD_ShowxNum(150,250,PS2_KEY,6,16,0X80);
 			
 			
-//		 if(clear_flag==0)
-//		 {
-//			 clear();
-//			 clear_flag=1;
-//		 }
-//        if(PS2_flag==0)
-//        {
-//			PS2_LX=PS2_AnologData(PSS_LX);    
-//			PS2_LY=PS2_AnologData(PSS_LY);
-//			PS2_RX=PS2_AnologData(PSS_RX);
-//			PS2_RY=PS2_AnologData(PSS_RY);
-//			PS2_KEY=PS2_DataKey();
-//					if(PS2_LX>128)
-//					{
-//								motorCMD(2000,0);
-//					}
-//					if(PS2_LY>128)
-//								motorCMD(0,2000);
-//					if(PS2_KEY!=0)
-//						PS2_flag=1;
-//        }
-//        else
-//        {
             if(Px<0)
             {
                 LCD_ShowString(60,50,200,16,16,"x=");
@@ -314,29 +319,5 @@ int main(void)
                 LCD_ShowString(55,150,200,16,16," ");
                 LCD_ShowxNum(60,150,Pp,6,16,0X80);
             }
-            if(flag_step==0)//走形第一阶段 走大圆
-            {
-//                closeRound(0,2200, 1700,1,3500,0);// 大圆：
-							  back_Turn(0,1500);
-                LCD_ShowString(60,250,200,16,16,"step==1");
-
-            }
-//            if((Px>1400&&Px<1600&&Py>300&&Py<1200)||flag_step==1)	//到达标志点附近 切换阶段 第二阶段撞边
-//            {
-//                flag_step=1;
-//                LCD_ShowString(60,250,200,16,16,"step==2");
-//                straightLine(1,0,0,0,3000);
-//                if(Px>-200&&Px<200&&Pp>-20&&Pp<20&&Py>1600&&Py<1800)//到达中边框附近 切换阶段 第三阶段靠边
-//                {
-//                    flag_step=2;
-//                    LCD_ShowString(60,250,200,16,16,"step==3");
-//                }
-//            }
-//            if(flag_step==2)
-//						{
-//							back_Turn(0,1500);
-//            printf("x:%fy:%fp:%f\n",Px,Py,Pp);
-//						}
-        }
-////    }
+					}
 }

@@ -64,13 +64,6 @@ extern void PID_clear(PidTypeDef *pid);
 extern void PID_para_init(PidTypeDef *pid,const fp32 PID[3]);
 
 
-//float pid_control_gyro_left(PidTypeDef *pid,float ref,float set);
-//float pid_control_gyro_right(PidTypeDef *pid,float ref,float set);
-//float pid_control_distance_left(PidTypeDef *pid,float ref,float set);
-//float pid_control_distance_right(PidTypeDef *pid,float ref,float set);
-//float pid_control_distance_all(PidTypeDef *pid,float ref,float set);
-//void PID_Init_distance(void);  
-
 //__PID_EXT   PidTypeDef distance_left,distance_right,distance_all,gyro_left,gyro_right;
 
 #endif

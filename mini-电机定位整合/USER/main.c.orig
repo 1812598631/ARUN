@@ -19,6 +19,7 @@ static float laser_distance;
 fp32 Px,Py;
 float Pp;
 fp32 v;
+u8 state_flag=0;
 /************************************************
 所有变量P均为角度
 距离PID及角度PID
@@ -177,7 +178,7 @@ PID参数繁多 难调
 距离-角度PID	关系到圆环的半径
 
 
-直线动作 两种直线前进 一种向前走直线 一种向后走直线 
+直线动作 两种直线前进 一种向前走直线 一种向后走直线
 
 
 所有坐标系：
@@ -196,7 +197,31 @@ PID参数繁多 难调
 
 ************************************************/
 
+/************************************************
+9-1更新
+射球与底盘串口通讯
 
+四个框以及红蓝队开关均为射球读取
+
+底盘——>射球 红队 a:34边 b:32边 c:21边 d:14边	蓝队a:12边 b:23边 c:34边 d:14边
+射球——>底盘	帧头0x55 
+										 左激光高八位 低八位 右激光高八位 右激光低八位 
+										 抽签决定的第一个筒的序号：红队为 1234 蓝队为5678 对应(1234)
+										 抽签决定的第二个筒的序号：红队为 1234 蓝队为5678 对应(1234)
+						帧尾0xaa
+红蓝两队坐标系对应的四个桶的坐标为
+int32_t aim_tub1_red[2]={-2000,4200};		//700mm
+int32_t aim_tub2_red[2]={2000,4200};			//900mm
+int32_t aim_tub3_red[2]={2000,0};	//800mm
+int32_t aim_tub4_red[2]={-2000,0};	//1000mm
+
+int32_t aim_tub1_blue[2]={2000,0};		//700mm
+int32_t aim_tub2_blue[2]={-2000,0};			//900mm
+int32_t aim_tub3_blue[2]={-2000,4200};	//800mm
+int32_t aim_tub4_blue[2]={2000,4200};	//1000mm
+
+
+************************************************/
 
 /************************************************
 作者：阿RUN @SAU——科协
@@ -206,20 +231,24 @@ PID参数繁多 难调
 
 int main(void)
 {
-	u8 state[5]={0};
-	u8 switch_state;
-	u8 flag=1;
-	u8 clear_flag=0;
-	u8 PS2_flag=0;
-//	 int32_t motor_v1=3000;
-//int32_t motor_v2=3000;
+    u8 state[5]= {0};
+    u8 switch_state;
+    u8 flag_step=0;//行走阶段标志
+    u8 clear_flag=0;
+		
+		u8 shoot_tub1=0;
+u8 shoot_tub2=0;
+		
+//    u8 PS2_flag=0;//PS2标志
+//		u8 PS2_LX,PS2_LY,PS2_RY,PS2_RX,PS2_KEY;
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);//设置中断优先级分组为组2：2位抢占优先级，2位响应优先级
     uart_init(115200);//串口初始化为115200
 
 
     delay_init();//延时函数初始化
-    MyusartInit2(19200);//串口2
+    MyusartInit2(115200);//串口2
     MyusartInit5(115200);
+		
     LCD_Init();
 
     CAN1_Mode_Init(CAN_SJW_1tq, CAN_BS2_3tq, CAN_BS1_8tq, 3, CAN_Mode_Normal);  //CAN初始化模式,波特率1Mbps
@@ -229,99 +258,67 @@ int main(void)
     TIM2_Init(3000,36000-1);//1.5秒定时
     TIM3_Init(3000,36000-1);//1.5秒定时
     TIM4_Init(2000,72-1);
-    delay_ms(20);
-//	 		motorCMD(1,0,v);
-//		motorCMD(2,0,v);
-//		give_motor1(motor_v1);
-//give_motor2(motor_v2);
-    delay_ms(5000);
+    delay_ms(3000);
     clear();
-		    PS2_Init();					//PS2管脚初始化
+    PS2_Init();					//PS2管脚初始化
     PS2_SetInit();		 //PS2配置初始化,配置“红绿灯模式”，并选择是否可以修改
 
 
     while(1)
-   {
+    {
         Px=GetPosX();
         Py=GetPosY();
         Pp=GetAngle();
-//		 if(clear_flag==0)
-//		 {
-//			 clear();
-//			 clear_flag=1;
-//		 }
-		 if(PS2_flag==0)
-		 {
-		 
-		 
-		 
-		 }
-		 else
-		 {
-        if(Px<0)
-        {
-            LCD_ShowString(60,50,200,16,16,"x=");
-            LCD_ShowString(55,70,200,16,16,"-");
-            LCD_ShowxNum(60,70,-Px,6,16,0X80);
-        }
-        else
-        {
-            LCD_ShowString(60,50,200,16,16,"x=");
-            LCD_ShowString(55,70,200,16,16," ");
-
-            LCD_ShowxNum(60,70,Px,6,16,0X80);
-        }
-        if(Py<0)
-        {
-            LCD_ShowString(60,90,200,16,16,"y=");
-            LCD_ShowString(55,110,200,16,16,"-");
-            LCD_ShowxNum(60,110,-Py,6,16,0X80);
-        }
-        else
-        {
-            LCD_ShowString(60,90,200,16,16,"y=");
-            LCD_ShowString(55,110,200,16,16," ");
-
-            LCD_ShowxNum(60,110,Py,6,16,0X80);
-        }
-        if(Pp<0)
-        {
-            LCD_ShowString(60,130,200,16,16,"Angle=");
-            LCD_ShowString(55,150,200,16,16,"-");
-            LCD_ShowxNum(60,150,-Pp,6,16,0X80);
-        }
-        else
-        {
-            LCD_ShowString(60,130,200,16,16,"Angle=");
-            LCD_ShowString(55,150,200,16,16," ");
-            LCD_ShowxNum(60,150,Pp,6,16,0X80);
-        }
-				
-				if((Px>1700&&Px<1800&&Py>1650&&Py<1750)||flag==0)
-			{
-				flag=0;
-			LCD_ShowString(60,250,200,16,16,"OK");
-//			closeRound(0,2200, 1000,1,1500,1);// 大圆：
-
-			straightLine(1,0,0,0,1500);
-			if(Px>-300&&Px<300)
-			{
-			flag=2;
-			LCD_ShowString(60,250,200,16,16,"step==3");
-			}
-			}
-			if(flag==1)
-			{
-				 closeRound(0,2200, 1500,1,3000,0);// 大圆：
-				 LCD_ShowString(60,250,200,16,16,"NO");
-
-			}
-			if(flag==2)
-				forward_Turn(0,-1500);
-//				straightLine(1,0,0,0,-1500);
-        printf("x:%fy:%fp:%f\n",Px,Py,Pp);
 			
-				
-		}
-    }
+			Round_shoot();
+//				PS2_LX=PS2_AnologData(PSS_LX);    
+//				PS2_LY=PS2_AnologData(PSS_LY);
+//				PS2_RX=PS2_AnologData(PSS_RX);
+//				PS2_RY=PS2_AnologData(PSS_RY);
+//				PS2_KEY=PS2_DataKey();
+//			
+//								LCD_ShowString(150,230,2,16,16,"key");
+//                LCD_ShowString(145,250,200,16,16,"-");
+//                LCD_ShowxNum(150,250,PS2_KEY,6,16,0X80);
+			
+			
+            if(Px<0)
+            {
+                LCD_ShowString(60,50,200,16,16,"x=");
+                LCD_ShowString(55,70,200,16,16,"-");
+                LCD_ShowxNum(60,70,-Px,6,16,0X80);
+            }
+            else
+            {
+                LCD_ShowString(60,50,200,16,16,"x=");
+                LCD_ShowString(55,70,200,16,16," ");
+
+                LCD_ShowxNum(60,70,Px,6,16,0X80);
+            }
+            if(Py<0)
+            {
+                LCD_ShowString(60,90,200,16,16,"y=");
+                LCD_ShowString(55,110,200,16,16,"-");
+                LCD_ShowxNum(60,110,-Py,6,16,0X80);
+            }
+            else
+            {
+                LCD_ShowString(60,90,200,16,16,"y=");
+                LCD_ShowString(55,110,200,16,16," ");
+
+                LCD_ShowxNum(60,110,Py,6,16,0X80);
+            }
+            if(Pp<0)
+            {
+                LCD_ShowString(60,130,200,16,16,"Angle=");
+                LCD_ShowString(55,150,200,16,16,"-");
+                LCD_ShowxNum(60,150,-Pp,6,16,0X80);
+            }
+            else
+            {
+                LCD_ShowString(60,130,200,16,16,"Angle=");
+                LCD_ShowString(55,150,200,16,16," ");
+                LCD_ShowxNum(60,150,Pp,6,16,0X80);
+            }
+					}
 }
