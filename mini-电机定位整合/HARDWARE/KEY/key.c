@@ -161,9 +161,9 @@ void MyusartInit5(u32 bound)
 void USART2_IRQHandler(void)
 {
     static uint8_t n = 0,rebuf_laser[8] = {0};
-    if(USART_GetITStatus(UART5, USART_IT_RXNE) != RESET)
+    if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
     {
-        rebuf_laser[n] = USART_ReceiveData(UART5);
+        rebuf_laser[n] = USART_ReceiveData(USART2);
         n++;
 			if (rebuf_laser[0]!= 0x55)	//帧头不为0x55则清零
         {
@@ -174,13 +174,13 @@ void USART2_IRQHandler(void)
 				{
         if (rebuf_laser[n-1]==0xaa&&n==8)	//帧尾为0xaa且接收整整一帧数据
         {
-								laser_left=rebuf_laser[1];
+								laser_left=rebuf_laser[2];
 								laser_left<<8;
-								laser_left|=rebuf_laser[2];
+								laser_left|=rebuf_laser[1];
 							
-								laser_right=rebuf_laser[3];
+								laser_right=rebuf_laser[4];
 								laser_right<<8;
-								laser_right|=rebuf_laser[4];
+								laser_right|=rebuf_laser[3];
 								tub_1=rebuf_laser[5];	
 								tub_2=rebuf_laser[6];
 								n=0;
@@ -313,7 +313,16 @@ float GetAngle(void)
     angle_templ=(float)PosAngle;
     return angle_templ/100;
 }
+u16 laser_L(void)
+{
+return laser_left;
 
+}
+u16 laser_R(void)
+{
+return laser_right;
+
+}
 void clear(void)
 {
     u8 clear1[8]="clearall";

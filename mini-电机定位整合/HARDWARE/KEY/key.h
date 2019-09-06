@@ -30,6 +30,8 @@ extern u16 USART_RX_STA3;         		//接收状态标记
 u16 Laser(u16 date);
 u8 aim_tub1(void);
 u8 aim_tub2(void);
+u16 laser_L(void);
+u16 laser_R(void);
 void getXYP(void);
 float GetPosX(void);
 float GetPosY(void);

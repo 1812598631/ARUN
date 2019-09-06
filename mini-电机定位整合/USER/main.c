@@ -244,11 +244,11 @@ int main(void)
 
 
     delay_init();//延时函数初始化
+		    LCD_Init();
+
     MyusartInit2(115200);//串口2
     MyusartInit5(115200);
 		
-    LCD_Init();
-
     CAN1_Mode_Init(CAN_SJW_1tq, CAN_BS2_3tq, CAN_BS1_8tq, 3, CAN_Mode_Normal);  //CAN初始化模式,波特率1Mbps
     chassis_init(&chassis_move);//底盘初始化
     //开启震动模式
@@ -267,9 +267,11 @@ int main(void)
         Px=GetPosX();
         Py=GetPosY();
         Pp=GetAngle();
-			
-			
-			Round_shoot();
+			UART2_Send_Byte('c');
+								LCD_ShowString(120,50,200,16,16,"laser=");
+                LCD_ShowxNum(120,70,laser_L(),6,16,0X80);
+
+//			Round_shoot();
 //				PS2_LX=PS2_AnologData(PSS_LX);    
 //				PS2_LY=PS2_AnologData(PSS_LY);
 //				PS2_RX=PS2_AnologData(PSS_RX);
@@ -321,3 +323,5 @@ int main(void)
             }
 					}
 }
+
+

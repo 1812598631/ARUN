@@ -15,7 +15,6 @@
 
 
 #define PI (3.141593f)
-static float laser_distance;
 fp32 Px,Py;
 float Pp;
 fp32 v;
@@ -237,8 +236,7 @@ int main(void)
     u8 clear_flag=0;
 		
 		u8 shoot_tub1=0;
-u8 shoot_tub2=0;
-		
+		u8 shoot_tub2=0;
 //    u8 PS2_flag=0;//PS2标志
 //		u8 PS2_LX,PS2_LY,PS2_RY,PS2_RX,PS2_KEY;
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);//设置中断优先级分组为组2：2位抢占优先级，2位响应优先级
@@ -270,7 +268,11 @@ u8 shoot_tub2=0;
         Py=GetPosY();
         Pp=GetAngle();
 			
-			Round_shoot();
+								LCD_ShowString(60,130,200,16,16,"Angle=");
+                LCD_ShowString(55,150,200,16,16," ");
+                LCD_ShowxNum(60,150,Pp,6,16,0X80);
+			
+//			Round_shoot();
 //				PS2_LX=PS2_AnologData(PSS_LX);    
 //				PS2_LY=PS2_AnologData(PSS_LY);
 //				PS2_RX=PS2_AnologData(PSS_RX);
